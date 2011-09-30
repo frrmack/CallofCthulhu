@@ -1,0 +1,10 @@
+
+# This is for limiting what you can do in the game
+# Basically, they ensure the game doesn't continue
+# Until you do whatever you do
+
+class ForcedAction:
+    pass
+
+
+def 
