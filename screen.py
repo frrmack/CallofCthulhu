@@ -8,6 +8,7 @@ resolutions = ((1280,600),   #0
                (1280,1024),  #2
                (1440,900),   #3
                (1920,1200))  #4
+
 screenmodes = ("windowed",   #0
                "fullscreen") #1
 
@@ -26,20 +27,14 @@ backgrounds = ("cthulhu_1440x900.jpg",               #0
                "woodF_1280x800.jpg")                 #12
 
 
-
-
-
-
-
-
-
-
 ###############################
+##### CHOOSE DISPLAY MODE #####
 
 resolution = 1 
 fullscreen = 0
 background = 6
 
+###############################
 ###############################
 
 pygame.init()
