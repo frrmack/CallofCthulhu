@@ -19,7 +19,7 @@ except:
 
 class AI(Player):
 
-
+    species = 'AI'
 
 
     def restoreOneInsane(self):
@@ -105,6 +105,10 @@ class AI(Player):
         return character, story
 
 
+
+    def chooseOneFromStoryToGoInsane(self):
+        # Not coded yet
+        return None
 
 
 

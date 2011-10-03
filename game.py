@@ -31,10 +31,12 @@ print 'SEED', SEED, '\n'
 
 
 # GAME IMPORTS
-from style import *
+from util import *
 from player import Player
 from AI import AI
 from card import *
+from story import Story
+from cardheap import Deck
 import getDecision
 
 if NOPAUSE:

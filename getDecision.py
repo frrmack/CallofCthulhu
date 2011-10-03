@@ -10,6 +10,8 @@ isAI = lambda Player: isinstance(Player, AI)
 
 
 
+
+
 def restoreOneInsane(Player):
     if isAI(Player):
         return Player.restoreOneInsane()
@@ -45,7 +47,11 @@ def commitCharacterToStoryWhenDefending(Player):
         raise KeyError("HUMAN PLAYERS NOT CODED YET")
     
 
-
+def chooseOneFromStoryToGoInsane(Player):
+    if isAI(Player):
+        return Player.chooseOneFromStoryToGoInsane()
+    else:
+        raise KeyError("HUMAN PLAYERS NOT CODED YET")
 
 
 

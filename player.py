@@ -1,6 +1,6 @@
 import random as rnd
-from style import *
-from card import CardHeap, Deck
+from util import *
+from cardheap import CardHeap, Deck
 
 
 
