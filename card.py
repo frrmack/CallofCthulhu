@@ -16,8 +16,8 @@ class Card:
         self.state = ['ready', 'exhausted'][0]
         # imageFiles can be given as a string or
         # a sequence of strings (filenames)
-        if imagefiles != None:
-            if hasattr(imagefiles, "strip"):
+        if imageFiles != None:
+            if hasattr(imageFiles, "strip"):
                 # a single string -- one file
                 self.image = CardImage(imageFiles)
             elif hasattr(imageFiles, "__getitem__") and len(imageFiles)==2:

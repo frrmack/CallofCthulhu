@@ -236,7 +236,7 @@ if __name__ == '__main__':
     ###############################
 
     import random as rnd
-    pygame.init()
+    pygame.init()    # init twice if you experience sound problems
 
     # Initialize screen
     resolution = sources['resolutions'][resolution]
