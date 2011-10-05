@@ -1,16 +1,16 @@
 import sys, pygame
-from copy import copy
 from util import *
-
+from graphics import Screen, CardImage, DomainImage, readClick
 
 resolutions = ((1280,600),   #0
                (1280,800),   #1
                (1280,1024),  #2
-               (1440,900),   #3
-               (1920,1200))  #4
+               (1268,970),   #3
+               (1440,900),   #4
+               (1920,1200))  #5
 
-screenmodes = ("windowed",   #0
-               "fullscreen") #1
+enableFullscreen  = (False, #0
+                     True)  #1
 
 backgrounds = ("cthulhu_1440x900.jpg",               #0
                "cthulhu_1920x1200.jpg",              #1
@@ -30,44 +30,24 @@ backgrounds = ("cthulhu_1440x900.jpg",               #0
 ###############################
 ##### CHOOSE DISPLAY MODE #####
 
-resolution = 1 
+resolution = 3  
 fullscreen = 0
-background = 6
+background = 7
 
 ###############################
 ###############################
 
 pygame.init()
 
-
 # Initialize screen
-size = WIDTH, HEIGHT = resolutions[resolution]
-screenmode = screenmodes[fullscreen]
-if fullscreen:
-    screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
-else:
-    screen = pygame.display.set_mode(size)
-
+resolution = resolutions[resolution]
+fullscreen = enableFullscreen[fullscreen]
 background = "Backgrounds/" + backgrounds[background]
-background = pygame.image.load(background).convert()
+
+screen = Screen(resolution, background, fullscreen,
+                caption = "Call of Cthulhu LCG")
 
 
-def readInput():
-    mouseDown = False
-    finished = False
-    while not finished:
+print 'Mouse clicked at',readClick()
 
-        # Quit on click or key press or window close
-        for event in pygame.event.get():
-            if event.type in (pygame.QUIT,  pygame.KEYDOWN):
-                sys.exit()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                mouseDown = True
-            elif event.type == pygame.MOUSEBUTTONUP and mouseDown:
-                finished = True
-
-
-screen.blit(background, (0,0))
-pygame.display.update()
-readInput()
 

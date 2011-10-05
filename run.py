@@ -1,15 +1,16 @@
-import sys, pygame
-from copy import copy
+import pygame
 from util import *
-
+from graphics import Screen, CardImage, DomainImage, ZoomWindow, readClick
 
 resolutions = ((1280,600),   #0
                (1280,800),   #1
                (1280,1024),  #2
-               (1440,900),   #3
-               (1920,1200))  #4
-screenmodes = ("windowed",   #0
-               "fullscreen") #1
+               (1268,970),   #3
+               (1440,900),   #4
+               (1920,1200))  #5
+
+enableFullscreen  = (False, #0
+                     True)  #1
 
 backgrounds = ("cthulhu_1440x900.jpg",               #0
                "cthulhu_1920x1200.jpg",              #1
@@ -26,35 +27,27 @@ backgrounds = ("cthulhu_1440x900.jpg",               #0
                "woodF_1280x800.jpg")                 #12
 
 
+###############################
+##### CHOOSE DISPLAY MODE #####
 
-
-
-
-
-
-
+resolution = 3  
+fullscreen = 0
+background = 7
 
 ###############################
-
-resolution = 1 
-fullscreen = 0
-background = 6
-
 ###############################
 
 pygame.init()
 
-
 # Initialize screen
-size = WIDTH, HEIGHT = resolutions[resolution]
-screenmode = screenmodes[fullscreen]
-if fullscreen:
-    screen = pygame.display.set_mode(size,pygame.FULLSCREEN)
-else:
-    screen = pygame.display.set_mode(size,pygame)
+resolution = resolutions[resolution]
+fullscreen = enableFullscreen[fullscreen]
+background = "Backgrounds/" + backgrounds[background]
 
-background = backgrounds[background]
-background = pygame.image.load(background).convert()
+screen = Screen(resolution, background, fullscreen,
+                caption = "Call of Cthulhu LCG")
+
+window = ZoomWindow()
 
 
 

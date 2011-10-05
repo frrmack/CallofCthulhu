@@ -3,9 +3,10 @@ import numpy.random
 poisson = numpy.random.poisson
 
 from util import *
+from graphics import CardImage
 
 class Card:
-    def __init__(self, name, **kwargs):
+    def __init__(self, name, imagefiles=None, **kwargs):
         self.name = name
         self.owner = None
         self.controller = None
@@ -13,7 +14,13 @@ class Card:
         self.attached = []
         self.keywords = []
         self.state = ['ready', 'exhausted'][0]
-
+        # imagefile can be given as a string or
+        # a sequence of strings (filenames)
+        if imagefiles != None:
+            if hasattr(imagefiles, "strip"):
+                # a single string
+                self.image = 
+                
     def __repr__(self):
         text = genericCardColor(self.name)
         if self.isExhausted():
