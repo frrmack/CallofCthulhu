@@ -102,7 +102,7 @@ class Game:
 #-----------------------------------------------
 
 
-# THE GAME
+# TEXT DEMO OF THE GAME
 
 try:
 

@@ -26,8 +26,12 @@ def toInt(flt):
 
 
 # GRAPHICS
-def scale(surface, ratio=None, width=None, height=None):
-    if (ratio, width, height) == (None, None, None):
+def scale(surface, ratio=None, size=None, width=None, height=None):
+    if size != None:
+        width, height = size
+    if (ratio, size, width, height) == (None, None, None, None):
+        return surface
+    elif ratio == 1 or (width, height) == surface.get_size():
         return surface
     elif ratio is not None:
         if ratio == 1:

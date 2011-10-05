@@ -98,13 +98,15 @@ class Image(object):
 
 
 class CardImage(Image):
-    def __init__(self, fileName, bigFileName=None, screen=None):
+    regularSize = (112,160)
+    zoomSize = (336,480)
+    
+    def __init__(self, fileName, screen=None):
         self.fileName=fileName
-        self.bigFileName = bigFileName
         Image.__init__(self, pygame.image.load(fileName).convert(), screen)
-        if bigFileName != None:
-            self.bigSurface = pygame.image.load(bigFileName).convert()
-  
+        self.bigSurface = scale(self.surface, size=self.zoomSize)
+        self.surface = scale(self.surface, size=self.regularSize)
+                                
     def drawZoomed(self, pos):
         self.drawSurface(self.bigSurface, pos)
 
@@ -116,9 +118,14 @@ class CardImage(Image):
         self.surface = pygame.transform.rotate(self.surface,90)
         return self
 
+class StoryImage(CardImage):
+    regularSize = (160,112)
+    zoomSize = (480,336)
+    
+    
 class DomainImage(CardImage):
-    def __init__(self, fileName, bigFileName=None, screen=None):
-        CardImage.__init__(self, fileName, bigFileName, screen)
+    def __init__(self, fileName, screen=None):
+        CardImage.__init__(self, fileName, screen)
         self.turnRight()
 
 
@@ -184,20 +191,20 @@ if __name__ == '__main__':
 
     sources = {}
 
-    sources['stories'] = (("Stories/tn_gallery_38_203853.jpg", "Stories/med_gallery_38_203853.jpg"),
-                          ("Stories/tn_gallery_38_166479.jpg", "Stories/med_gallery_38_166479.jpg"),
-                          ("Stories/tn_gallery_38_370341.jpg", "Stories/med_gallery_38_370341.jpg"))
+    sources['stories'] = ("Stories/med_gallery_38_203853.jpg",
+                          "Stories/med_gallery_38_166479.jpg",
+                          "Stories/med_gallery_38_370341.jpg")
 
-    sources['characters'] = (("Cards/tn_gallery_38_29631.jpg","Cards/med_gallery_38_29631.jpg"),
-                             ("Cards/tn_gallery_38_54002.jpg","Cards/med_gallery_38_54002.jpg"),
-                             ("Cards/tn_gallery_38_80091.jpg","Cards/med_gallery_38_80091.jpg"),
-                             ("Cards/tn_gallery_38_88054.jpg","Cards/med_gallery_38_88054.jpg"),
-                             ("Cards/dagon.jpg", "Cards/dagonBig.jpg"),
-                             ("Cards/yGolonac.jpg", "Cards/yGolonacBig.jpg"))
+    sources['characters'] = ("Cards/med_gallery_38_29631.jpg",
+                             "Cards/med_gallery_38_54002.jpg",
+                             "Cards/med_gallery_38_80091.jpg",
+                             "Cards/med_gallery_38_88054.jpg",
+                             "Cards/dagonBig.jpg",
+                             "Cards/yGolonacBig.jpg")
 
-    sources['events'] = (("Events/tn_gallery_38_313098.jpg","Events/med_gallery_38_313098.jpg"),)
+    sources['events'] = ("Events/med_gallery_38_313098.jpg",)
 
-    sources['turned card'] = ("Cards/cardBack.jpg","Cards/cardBackBig.jpg")
+    sources['turned card'] = ("Cards/cardBackBig.jpg")
 
 
     sources['resolutions'] = ((1280,600),   #0
@@ -252,12 +259,12 @@ if __name__ == '__main__':
     def randomCards(n):
         characters = []
         for i in range(30):
-            img, bigImg = rnd.choice(sources['characters'])
-            characters.append(CardImage(img, bigImg, screen))
+            img = rnd.choice(sources['characters'])
+            characters.append(CardImage(img, screen))
         events = []
         for i in range(10):
-            img, bigImg = rnd.choice(sources['events'])
-            events.append(CardImage(img, bigImg, screen))
+            img = rnd.choice(sources['events'])
+            events.append(CardImage(img, screen))
         return rnd.sample(characters+events, n)
 
 
@@ -268,7 +275,7 @@ if __name__ == '__main__':
         screen.clear()
 
         # Stories
-        stories =    [CardImage(img, bigImg, screen) for img, bigImg in sources['stories']]
+        stories =    [StoryImage(img, screen) for img in sources['stories']]
         x = toInt(  (screen.width - 300 - 600) /2.  )
         y = toInt(  screen.height//2 - 56  )
         for i in range(len(stories)):
@@ -286,8 +293,8 @@ if __name__ == '__main__':
             userHand[i].draw(pos)
 
         # Enemy Hand
-        img, bigImg = sources['turned card']
-        enemyHand = [CardImage(img, bigImg, screen) for card in range(5)]
+        img = sources['turned card']
+        enemyHand = [CardImage(img, screen) for card in range(5)]
         x = screen.width - 115
         y = 0
         step = toInt( 224./ (len(enemyHand)-1) )
@@ -313,8 +320,8 @@ if __name__ == '__main__':
             enemyDiscardPile[i].draw(pos)
 
         # User Domains
-        img, bigImg = sources['turned card']
-        userDomains  = [DomainImage(img, bigImg, screen) for domain in range(3)]
+        img = sources['turned card']
+        userDomains  = [DomainImage(img, screen) for domain in range(3)]
         x = -100
         y = screen.height - 112
         if showResources:
@@ -329,8 +336,8 @@ if __name__ == '__main__':
             userDomains[i].draw(pos)
 
         # Enemy Domains
-        img, bigImg = sources['turned card']
-        enemyDomains = [DomainImage(img, bigImg, screen) for domain in range(3)]
+        img = sources['turned card']
+        enemyDomains = [DomainImage(img, screen) for domain in range(3)]
         x = -100
         y = 0
         for i in range(len(enemyDomains)):
