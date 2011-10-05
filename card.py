@@ -6,7 +6,7 @@ from util import *
 from graphics import CardImage
 
 class Card:
-    def __init__(self, name, imagefiles=None, **kwargs):
+    def __init__(self, name, imageFiles=None, **kwargs):
         self.name = name
         self.owner = None
         self.controller = None
@@ -14,12 +14,18 @@ class Card:
         self.attached = []
         self.keywords = []
         self.state = ['ready', 'exhausted'][0]
-        # imagefile can be given as a string or
+        # imageFiles can be given as a string or
         # a sequence of strings (filenames)
         if imagefiles != None:
             if hasattr(imagefiles, "strip"):
-                # a single string
-                self.image = 
+                # a single string -- one file
+                self.image = CardImage(imageFiles)
+            elif hasattr(imageFiles, "__getitem__") and len(imageFiles)==2:
+                # a sequence with two strings -- two files
+                smallImg, bigImg = imageFiles
+                self.image = CardImage(smallImg, bigImg)
+            else:
+                raise TypeError("imageFiles should be a string or a sequence of 2 strings.")
                 
     def __repr__(self):
         text = genericCardColor(self.name)

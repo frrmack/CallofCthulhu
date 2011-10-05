@@ -43,7 +43,7 @@ def scale(surface, ratio=None, width=None, height=None):
         h = toInt((1.*w/surface.get_width()) * surface.get_height())
     else:
         raise KeyError("Debug: Shouldn't happen")
-    return pygame.transform.smoothscale(surface, w, h)
+    return pygame.transform.smoothscale(surface, (w, h))
 
 
         

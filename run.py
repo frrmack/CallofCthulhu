@@ -51,4 +51,9 @@ window = ZoomWindow()
 
 
 
+readClick()
+
+
+
+
 
