@@ -254,8 +254,7 @@ if __name__ == '__main__':
         # Attach 1 card to each domain
         for ply in [P1, P2]:
             for i in range(3):
-                card = ply.randHandCard()
-                domain = ply.domains[i]
+                card, domain = getDecision.attachOneCardToADomain(ply)
                 ply.attach2Domain(card, domain)
                 print '%s ATTACHES %s TO %s' % (ply.name, card, domain)
         print

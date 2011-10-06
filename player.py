@@ -1,7 +1,7 @@
 import random as rnd
 from util import *
 from cardheap import CardHeap, Deck, Hand
-
+from domain import DomainPanel
 
 
 class Board:
@@ -39,68 +39,14 @@ class Board:
 
 
 
-
-class Domain:
-    def __init__(self, name=''):
-        self.name = name
-        self.resources = []
-        self.drained = False
-        
-    def __repr__(self):
-        text= self.name + ' [%i]' % self.totalRes()
-        return domainColor(text)
-
-    #-- Reports
-    def drainState(self):
-        if self.drained:
-            return 'Drained'
-        else:
-            return 'Fresh'
-
-    def report(self, long=False):
-        text = ''
-        if long: text += '-------------------\n' 
-        text += domainColor(self.__repr__() + ' [%s]' % self.drainState())
-        if long:
-            text += '\n'.join(map(repr,self.resources))
-            text += '\n-------------------\n'
-        return text
-        
-
-    #-- Information
-    def totalRes(self):
-        return len(self.resources)
-
-    def isDrained(self):
-        return self.drained
-
-    def isFresh(self):
-        return not self.drained
-
-
-    #-- Actions
-    def drain(self):
-        if not self.drained:
-            self.drained = True
-        else:
-            raise KeyError("Domain already drained.")
-            
-    def refresh(self):
-        self.drained = False
-
-
-
-
-
 class Player:
     def __init__(self, name=''):
         self.name = name
         self.game = None
         self.deck = Deck("%s's Deck" % self.name)
         self.board = Board()
-        self.domains = [Domain('Domain1'),
-                        Domain('Domain2'),
-                        Domain('Domain3')]
+        self.domainPanel = DomainPanel(self)
+        self.domains = self.domainPanel.domains
         self.discardPile = CardHeap()
         self.hand = Hand(self)
         
@@ -155,6 +101,11 @@ class Player:
         else:
             self.hand.remove(card)
             domain.resources.append(card)
+        if graphicsOn(self):
+            self.hand.redraw()
+            domain.redraw()
+            self.screen.update()
+
 
     def commit(self, card, story):
         if card not in self.board.characters:
@@ -177,6 +128,9 @@ class Player:
     
     def drawHandOnScreen(self):
         self.hand.draw()
+
+    def drawDomainsOnScreen(self):
+        self.domainPanel.draw()
 
     def payCost(self, card, domain):
         if domain is None:

@@ -26,6 +26,13 @@ def toInt(flt):
 
 
 # GRAPHICS
+def graphicsOn(obj):
+    if hasattr(obj, 'screen'):
+        return True
+    else:
+        return False
+
+
 def scale(surface, ratio=None, size=None, width=None, height=None):
     if (ratio, size, width, height) == (None, None, None, None):
         return surface

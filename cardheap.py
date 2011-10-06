@@ -2,6 +2,7 @@ from card import Card
 from util import *
 from layout import CARDWIDTH, CARDHEIGHT, CARDBACKIMAGE, \
                    HANDMAXWIDTH, MAXHANDSTEP, MINHANDSTEP
+import pygame
 
 class CardHeap(list):
     # A pile of cards
@@ -11,6 +12,9 @@ class CardHeap(list):
     #-- Actions
     def add(self, card):
         self.append(card)
+
+    def remove(self, card):
+        list.remove(self, card)
 
     def putInBottom(self, card):
         self.insert(0, card)
@@ -30,6 +34,12 @@ class Hand(CardHeap):
             self.screen = self.player.game.screen
             self.createHiddenCards()
 
+    def remove(self, card):
+        list.remove(self, card)
+        if graphicsOn(self.player):
+            self.screen = self.player.screen
+            if card.image in self.screen.drawnImages:
+                self.screen.drawnImages.remove(card.image)
     def belongToPlayer(self, player):
         self.player = player
         self.screen = self.player.game.screen
@@ -56,13 +66,14 @@ class Hand(CardHeap):
         x,y = self.pos = self.get_pos()
         step = toInt( 1.*HANDMAXWIDTH / (len(self)-1) )
         step = trunc(step, top=MAXHANDSTEP, bottom=MINHANDSTEP)
+        self.rect = pygame.Rect(x-(len(self)-1)*step,y,CARDWIDTH+(len(self)-1)*step,CARDHEIGHT)
 
         if self.player.position == "Player 1":  #show cards
             for i in range(len(self)-1, -1, -1):
                 pos = (x-step*i, y)
                 self[i].image.draw(pos)
-                if i!= len(self)-1:
-                    self[i+1].image.rect[2] -= CARDWIDTH - step # clip rectangle (for click accuracy)
+                # if i!= len(self)-1:
+                #     self[i+1].image.rect[2] -= CARDWIDTH - step # clip rectangle (for click accuracy)
         
         elif self.player.position == "Player 2": #don't show cards
             self.createHiddenCards()
@@ -74,6 +85,19 @@ class Hand(CardHeap):
     def clear(self):
         self.screen = self.player.game.screen
         self.screen.blit(self.screen.background.subsurface(self.rect),self.rect)
+        if self.player.position == "Player 1":
+            for card in self:
+                if card in self.screen.drawnImages:
+                    self.screen.drawnImages.remove(card.image)
+        elif self.player.position == "Player 2":
+            for i in range(len(self)):
+                card = hiddenCards[i]
+                if card.image in self.screen.drawnImages:
+                    self.screen.drawnImages.remove(card.image)
+        else:
+            raise KeyError("Only available player positions are Player 1 and Player 2.")
 
-
+    def redraw(self):
+        self.clear()
+        self.draw()
 

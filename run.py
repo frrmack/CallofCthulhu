@@ -109,8 +109,15 @@ try:
     # NEW GAME SETUP
     game = Game(P1,P2)
     game.screen = screen
+    P1.screen = screen
+    P2.screen = screen
 
-    # Shuffle Decks
+    # Draw domains
+    P1.domainPanel.draw()
+    P2.domainPanel.draw()
+
+
+    # Shuffle decks
     rnd.shuffle(P1.deck)
     rnd.shuffle(P2.deck)
     rnd.shuffle(storydeck)
@@ -129,6 +136,13 @@ try:
     P1.drawHandOnScreen()
     P2.drawHandOnScreen()
     screen.update()
+
+    # Attach 1 card to each domain
+    for ply in [P1, P2]:
+        for i in range(3):
+            card, domain = getDecision.attachOneCardToADomain(ply)
+            ply.attach2Domain(card, domain)
+    
 
     screen.readClick()
 

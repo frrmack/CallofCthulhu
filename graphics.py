@@ -1,6 +1,7 @@
 import sys, pygame
 from copy import copy
 from util import *
+from layout import *
 
 class Screen(object):
     def __init__(self, resolution, backgroundFileName=None,
@@ -42,14 +43,27 @@ class Screen(object):
     def update(self, *args, **kwargs):
         pygame.display.update(*args, **kwargs)
 
+
+    def clipRectWithin(self, rect):
+        x,y,w,h = rect
+        x = trunc(x, top=self.width, bottom=0)
+        y = trunc(y, top=self.height, bottom=0)
+        w = trunc(w, top=self.width-x)
+        h = trunc(w, top=self.height-y)
+        return pygame.Rect(x,y,w,h)
+
+
+    def activateZoomWindow(self):
+        self.window.clear()
+        for card in self.drawnImages:
+            if card.within(pygame.mouse.get_pos()):
+                self.window.show(card)
+        
+
     def readClick(self):
         while 1:
 
-            # Zoom Window (mouse hover)
-            self.window.clear()
-            for card in self.drawnImages:
-                if card.within(pygame.mouse.get_pos()):
-                    self.window.show(card)
+            self.activateZoomWindow
             self.update()
 
             # Read Input
@@ -122,8 +136,8 @@ class Image(object):
 
 
 class CardImage(Image):
-    regularSize = (112,160)
-    zoomSize = (336,480)
+    regularSize = (CARDWIDTH, CARDHEIGHT)
+    zoomSize = (ZOOMEDCARDWIDTH, ZOOMEDCARDHEIGHT)
     
     def __init__(self, fileName, screen=None):
         self.fileName=fileName
@@ -143,8 +157,8 @@ class CardImage(Image):
         return self
 
 class StoryImage(CardImage):
-    regularSize = (160,112)
-    zoomSize = (480,336)
+    regularSize = (CARDHEIGHT,CARDWIDTH)
+    zoomSize = (ZOOMEDCARDHEIGHT,ZOOMEDCARDWIDTH)
     
     
 class DomainImage(CardImage):
@@ -185,7 +199,6 @@ class ZoomWindow(Image):
 
 
     
-
 
 
 
