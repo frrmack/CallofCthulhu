@@ -70,7 +70,7 @@ class Card:
     def setScreen(self, screen):
         self.screen = screen
         self.image.addToScreen(screen)
-
+        return self
 
 class Character(Card):
     def __init__(self, name, imageFileName=None,

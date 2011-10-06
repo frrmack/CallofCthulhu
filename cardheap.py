@@ -28,13 +28,18 @@ class Hand(CardHeap):
         self.player = player
         if player != None and player.game != None:
             self.screen = self.player.game.screen
-        
+            self.createHiddenCards()
 
     def belongToPlayer(self, player):
         self.player = player
         self.screen = self.player.game.screen
+        self.createHiddenCards()
 
-    # These should be set in layout.py
+    def createHiddenCards(self):
+        if self.player.position == "Player 2" and not hasattr(self,"hiddenCards"):
+            self.hiddenCards = [Card('hidden', CARDBACKIMAGE).setScreen(self.screen) for i in range(15)]
+        
+
     def get_pos(self):
         self.screen = self.player.game.screen
         x = self.screen.width - CARDWIDTH
@@ -60,11 +65,10 @@ class Hand(CardHeap):
                     self[i+1].image.rect[2] -= CARDWIDTH - step # clip rectangle (for click accuracy)
         
         elif self.player.position == "Player 2": #don't show cards
-            hiddenCard = Card('hidden', CARDBACKIMAGE)
-            hiddenCard.setScreen(self.screen)
+            self.createHiddenCards()
             for i in range(len(self)-1, -1, -1):
                 pos = (x-step*i, y)
-                hiddenCard.image.draw(pos)
+                self.hiddenCards[i].image.draw(pos)
                 
 
     def clear(self):

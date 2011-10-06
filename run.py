@@ -51,9 +51,9 @@ backgrounds = ("cthulhu_1440x900.jpg",               #0
 ###############################
 ##### CHOOSE DISPLAY MODE #####
 
-resolution = 3  
-fullscreen = 0
-background = 7
+resolution = 3    # 3  4  5
+fullscreen = 0    # 0  0  1
+background = 7    # 7  0  0
 
 ###############################
 ###############################
