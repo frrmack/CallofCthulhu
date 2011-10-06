@@ -1,6 +1,32 @@
+import sys, time
 import pygame
+import random as rnd
+import numpy.random
+poisson = numpy.random.poisson
+
+
 from util import *
 from graphics import Screen, CardImage, DomainImage, ZoomWindow, readClick
+from game import Game, parseCardFile
+
+
+from AI import AI
+from story import Story
+from card import Character, Event, Support
+from cardheap import Deck
+import getDecision
+
+# class eachPlayerSacrificesOneCharAfterDraw(object):
+#     def hey():
+#         pass
+
+
+# Report seed (for debugging)
+if len(sys.argv) > 1:
+    SEED = int(sys.argv[1])
+else:
+    SEED = int(time.time())
+
 
 resolutions = ((1280,600),   #0
                (1280,800),   #1
@@ -49,9 +75,74 @@ screen = Screen(resolution, background, fullscreen,
 
 window = ZoomWindow()
 
+try:
 
 
-readClick()
+
+    # MAKE UP SOME PLAYERS AND CARDS
+
+    # Players
+    P1 = AI('Frrmack')
+    P2 = AI('Boris')
+    # P1 = Player('Frrmack')
+    # P2 = Player('Boris')
+
+
+    # Decks
+    Deck1 = Deck('Random Deck 1')
+    Deck2 = Deck('Random Deck 2')
+    for n in range(50):
+        # Cardtype = [Character, Event, Support][poisson(0.5) % 3]
+        # redcard = Cardtype( 'Red Card %i'%(n+1), randomize=True )
+        # bluecard = Cardtype( 'Blue Card %i'%(n+1), randomize=True )
+        card = parseCardFile("Cards/Cthulhu.card")
+        Deck1.add(card)
+        card = parseCardFile("Cards/Cthulhu.card")
+        Deck2.add(card)
+        
+    P1.useDeck(Deck1)
+    P2.useDeck(Deck2)
+
+    # Stories
+    storydeck = Deck('Random Story Deck')
+    for n in range(10):
+        # name = rnd.choice('ABCDEFGHIJKLXYZW') + \
+        #     rnd.choice('ABCDEFGHIJKLXYZW')
+        # storycard = Story( 'Story %s' % name  )
+        storycard = parseCardFile("Stories/Ancient_Apocrypha.card")
+        storydeck.add(storycard)
+
+    # NEW GAME SETUP
+    game = Game(P1,P2)
+    game.screen = screen
+
+    # Shuffle Decks
+    rnd.shuffle(P1.deck)
+    rnd.shuffle(P2.deck)
+    rnd.shuffle(storydeck)
+
+    # Arrange stories 
+    game.storydeck = storydeck
+    game.initiateStories()
+
+    # Draw 8 cards each
+    print '%s DRAWS 8 cards' % P1.name
+    print '%s DRAWS 8 cards\n' % P2.name
+    P1.draw(8)
+    P2.draw(8)
+
+
+
+
+
+
+
+except:
+    print 'SEED:',SEED
+    raise
+
+
+
 
 
 

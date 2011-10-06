@@ -27,11 +27,16 @@ def toInt(flt):
 
 # GRAPHICS
 def scale(surface, ratio=None, size=None, width=None, height=None):
-    if size != None:
-        width, height = size
     if (ratio, size, width, height) == (None, None, None, None):
         return surface
-    elif ratio == 1 or (width, height) == surface.get_size():
+    elif size != None:
+        w, h = size
+    elif height != None and width != None:
+        w, h = width, height
+    elif ratio == 1:
+        return surface
+    elif size == surface.get_size() or \
+         (width, height) == surface.get_size():
         return surface
     elif ratio is not None:
         if ratio == 1:
@@ -39,10 +44,10 @@ def scale(surface, ratio=None, size=None, width=None, height=None):
         else:
             w = toInt(surface.get_width()*ratio)
             h = toInt(surface.get_height()*ratio)
-    elif height is not None:
+    elif height != None:
         h = toInt(height)
         w = toInt((1.*h/surface.get_height()) * surface.get_width())
-    elif width is not None:
+    elif width != None:
         if height is None: w = toInt(width)
         h = toInt((1.*w/surface.get_width()) * surface.get_height())
     else:

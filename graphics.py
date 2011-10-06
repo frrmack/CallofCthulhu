@@ -89,8 +89,8 @@ class Image(object):
         self.width, self.height = 0,0       
         self.screen.drawnImages.remove(self)
 
-    def scale(self, ratio):
-        self.surface = scale(self.surface, ratio)
+    def scale(self, ratio=None, size=None, width=None, height=None):
+        self.surface = scale(self.surface, ratio, size, width, height)
         return self
 
     def within(self, pos):
@@ -162,6 +162,7 @@ class ZoomWindow(Image):
 def readClick(window):
     while 1:
 
+
         # Zoom Window (mouse hover)
         window.clear()
         for card in window.screen.drawnImages:
@@ -193,11 +194,11 @@ if __name__ == '__main__':
 
     sources['stories'] = ("Stories/med_gallery_38_203853.jpg",
                           "Stories/med_gallery_38_166479.jpg",
-                          "Stories/med_gallery_38_370341.jpg")
+                          "Stories/gallery_38_370341.jpg")
 
     sources['characters'] = ("Cards/med_gallery_38_29631.jpg",
                              "Cards/med_gallery_38_54002.jpg",
-                             "Cards/med_gallery_38_80091.jpg",
+                             "Cards/gallery_38_80091.jpg",
                              "Cards/med_gallery_38_88054.jpg",
                              "Cards/dagonBig.jpg",
                              "Cards/yGolonacBig.jpg")
@@ -271,9 +272,12 @@ if __name__ == '__main__':
     # Draw
     def drawAll(handsize=8, showResources=False):
 
+        print 'drawAll'
+
         # Clear the screen
         screen.clear()
 
+        print '  Stories'
         # Stories
         stories =    [StoryImage(img, screen) for img in sources['stories']]
         x = toInt(  (screen.width - 300 - 600) /2.  )
@@ -282,6 +286,7 @@ if __name__ == '__main__':
             pos = (x + 200*i, y)
             stories[i].draw(pos)
 
+        print '  User Hand'
         # User Hand
         userHand  = randomCards(handsize)
         x = screen.width - 115
@@ -292,6 +297,7 @@ if __name__ == '__main__':
             pos = (x - step*i, y)
             userHand[i].draw(pos)
 
+        print '  Enemy Hand'
         # Enemy Hand
         img = sources['turned card']
         enemyHand = [CardImage(img, screen) for card in range(5)]
@@ -302,6 +308,7 @@ if __name__ == '__main__':
             pos = (x - step*i, y)
             enemyHand[i].draw(pos)
 
+        print '  User Discard Pile'
         # User Discard Pile
         userDiscardPile  = map(lambda c: c.scale(0.5), randomCards(2))
         x = screen.width - 480 + 35
@@ -311,6 +318,7 @@ if __name__ == '__main__':
             pos = (x, y - step*i)
             userDiscardPile[i].draw(pos)
 
+        print '  Enemy Discard Pile'
         # Enemy Discard Pile
         enemyDiscardPile = map(lambda c: c.scale(0.5), randomCards(12))
         x = screen.width - 480 + 35
@@ -319,6 +327,7 @@ if __name__ == '__main__':
             pos = (x, y+step*i)
             enemyDiscardPile[i].draw(pos)
 
+        print '  User Domains'
         # User Domains
         img = sources['turned card']
         userDomains  = [DomainImage(img, screen) for domain in range(3)]
@@ -335,6 +344,7 @@ if __name__ == '__main__':
             pos = (x, y-116*i)
             userDomains[i].draw(pos)
 
+        print '  Enemy Domains'
         # Enemy Domains
         img = sources['turned card']
         enemyDomains = [DomainImage(img, screen) for domain in range(3)]
@@ -344,6 +354,7 @@ if __name__ == '__main__':
             pos = (x, y+116*i)
             enemyDomains[i].draw(pos)
 
+        print '  Update'
         # Update
         screen.update()
 

@@ -116,9 +116,10 @@ class SkillStruggle(Struggle):
 
 class Story(Card):
     def __init__(self, name, 
+                 imageFileName = None,
                  struggles = None,
                  *args, **kwargs):
-        Card.__init__(self, name, *args, **kwargs)
+        Card.__init__(self, name, imageFileName, *args, **kwargs)
         self.committed = {}
         self.success = {}
         self.game = None
@@ -180,6 +181,30 @@ class Story(Card):
             return False
 
     #-- Actions
+    def appendTerrorStruggle(self):
+        struggle = TerrorStruggle()
+        self.struggles.append(struggle)
+        struggle.addToStory(self)
+    def appendCombatStruggle(self):
+        struggle = CombatStruggle()
+        self.struggles.append(struggle)
+        struggle.addToStory(self)
+    def appendArcaneStruggle(self):
+        struggle = ArcaneStruggle()
+        self.struggles.append(struggle)
+        struggle.addToStory(self)
+    def appendInvestigationStruggle(self):
+        struggle = InvestigationStruggle()
+        self.struggles.append(struggle)
+        struggle.addToStory(self)
+    def appendSkillStruggle(self):
+        struggle = SkillStruggle()
+        self.struggles.append(struggle)
+        struggle.addToStory(self)
+
+
+
+
     def enterGame(self, game, storyslot):
         if storyslot not in [0,1,2]:
             raise KeyError("This is not a valid story slot")

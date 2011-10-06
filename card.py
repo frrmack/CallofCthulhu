@@ -5,8 +5,9 @@ poisson = numpy.random.poisson
 from util import *
 from graphics import CardImage
 
+
 class Card:
-    def __init__(self, name, imageFileName=None, **kwargs):
+    def __init__(self, name, imageFileName=None):
         self.name = name
         self.owner = None
         self.controller = None
@@ -24,6 +25,8 @@ class Card:
         if self.isExhausted():
             text = boldColor('[Exh]') + text
         return text
+
+        
 
 
     #-- Information
@@ -65,18 +68,23 @@ class Card:
 
 class Character(Card):
     def __init__(self, name,
-                 cost=0, skill =0,
-                 terror=0, combat=0,
-                 arcane=0, investigation=0,
+                 cost=0, terror=0,
+                 combat=0, arcane=0,
+                 investigation=0,
+                 skill=0,
                  randomize = False,
                  *args, **kwargs):
         Card.__init__(self, name, *args, **kwargs)
         self.category = 'character'
         self.state = ['ready','exhausted', 'insane'][0]
+        self.printedTerror = self.terror = terror 
+        self.printedCombat = self.combat = combat
+        self.printedArcane = self.arcane = arcane
+        self.printedInvestigation = self.investigation = investigation
+        self.printedSkill = self.skill = skill
         self.wounds = 0
         self.toughness = 0
         
-
         if randomize:
             self.name = rnd.choice(['Aberrant ', 'Abominable ', 'Abysmal ',
                                     'Blasphemous ', 'Cosmic ', 'Corrupt ',
@@ -95,18 +103,14 @@ class Character(Card):
                             'Sorcerer', 'Insect', 'Criminal', 'Worshipper',
                             'Spawn', 'Ghoul', 'Humanoid', 'Creeper', 'Critters',
                             'Slime', 'Fish', 'Corpse'])
-            self.terror = poisson(0.7) % 3
-            self.combat = poisson(0.7) % 3
-            self.arcane = poisson(0.7) % 3
-            self.investigation = poisson(0.7)
-            self.cost = self.terror + self.combat + \
+            self.printedTerror = self.terror = poisson(0.7) % 3
+            self.printedCombat = self.combat = poisson(0.7) % 3
+            self.printedArcane = self.arcane = poisson(0.7) % 3
+            self.printedInvestigation = self.investigation = poisson(0.7)
+            self.printedCost = self.cost = self.terror + self.combat + \
                 self.arcane + self.investigation + rnd.randint(0,1)
-            self.skill = poisson((trunc(self.cost-1.5, bottom=0))) + rnd.randint(0,1)
-        else:
-            self.terror = terror 
-            self.combat = combat
-            self.arcane = arcane
-            self.investigation = investigation
+            self.printedSkill = self.skill = poisson((trunc(self.cost-1.5, bottom=0))) + rnd.randint(0,1)
+
 
     def __repr__(self):
         text = '[%i] ' % self.cost + \
