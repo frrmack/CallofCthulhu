@@ -6,19 +6,14 @@ poisson = numpy.random.poisson
 
 
 from util import *
-from graphics import Screen, CardImage, DomainImage, ZoomWindow, readClick
+from graphics import Screen
 from game import Game, parseCardFile
 
 
 from AI import AI
 from story import Story
-from card import Character, Event, Support
 from cardheap import Deck
 import getDecision
-
-# class eachPlayerSacrificesOneCharAfterDraw(object):
-#     def hey():
-#         pass
 
 
 # Report seed (for debugging)
@@ -73,7 +68,6 @@ background = "Backgrounds/" + backgrounds[background]
 screen = Screen(resolution, background, fullscreen,
                 caption = "Call of Cthulhu LCG")
 
-window = ZoomWindow()
 
 try:
 
@@ -124,15 +118,19 @@ try:
     # Arrange stories 
     game.storydeck = storydeck
     game.initiateStories()
+    game.drawStories()
+    screen.update()
 
     # Draw 8 cards each
     print '%s DRAWS 8 cards' % P1.name
     print '%s DRAWS 8 cards\n' % P2.name
     P1.draw(8)
     P2.draw(8)
+    P1.drawHandOnScreen()
+    P2.drawHandOnScreen()
+    screen.update()
 
-
-
+    screen.readClick()
 
 
 

@@ -3,6 +3,7 @@ import numpy.random
 poisson = numpy.random.poisson
 
 from util import *
+from layout import CARDBACKIMAGE
 from graphics import CardImage
 
 
@@ -19,6 +20,8 @@ class Card:
         # a sequence of strings (filenames)
         if imageFileName != None:
             self.image = CardImage(imageFileName)
+        else:
+            self.image = None
                 
     def __repr__(self):
         text = genericCardColor(self.name)
@@ -64,17 +67,20 @@ class Card:
         else:
             self.state = 'ready'
 
+    def setScreen(self, screen):
+        self.screen = screen
+        self.image.addToScreen(screen)
 
 
 class Character(Card):
-    def __init__(self, name,
+    def __init__(self, name, imageFileName=None,
                  cost=0, terror=0,
                  combat=0, arcane=0,
                  investigation=0,
                  skill=0,
                  randomize = False,
                  *args, **kwargs):
-        Card.__init__(self, name, *args, **kwargs)
+        Card.__init__(self, name, imageFileName, *args, **kwargs)
         self.category = 'character'
         self.state = ['ready','exhausted', 'insane'][0]
         self.printedTerror = self.terror = terror 
@@ -151,10 +157,10 @@ class Character(Card):
 
 
 class Event(Card):
-    def __init__(self, name,
+    def __init__(self, name, imageFileName=None,
                  randomize = False,
                  *args, **kwargs):
-        Card.__init__(self, name, *args, **kwargs)
+        Card.__init__(self, name, imageFileName, *args, **kwargs)
         self.category = 'event'
 
         if randomize:
@@ -178,11 +184,11 @@ class Event(Card):
 
 
 class Support(Card):
-    def __init__(self, name, 
+    def __init__(self, name, imageFileName=None,
                  category = 'boardSupport',
                  randomize = False,
                  *args, **kwargs):
-        Card.__init__(self, name, *args, **kwargs)
+        Card.__init__(self, name, imageFileName, *args, **kwargs)
         self.category = ['boardSupport', 'attachment'][0]
         self.category = category
 

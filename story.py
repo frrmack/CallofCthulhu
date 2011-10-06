@@ -1,5 +1,6 @@
 from util import *
 from card import Card
+from graphics import StoryImage
 import getDecision
 
 class Struggle:
@@ -120,6 +121,8 @@ class Story(Card):
                  struggles = None,
                  *args, **kwargs):
         Card.__init__(self, name, imageFileName, *args, **kwargs)
+        if imageFileName != None:
+            self.image = StoryImage(imageFileName)
         self.committed = {}
         self.success = {}
         self.game = None
@@ -216,7 +219,8 @@ class Story(Card):
         self.committed[self.Player2] = []
         self.success[self.Player1] = 0
         self.success[self.Player2] = 0
-
+        if hasattr(self, 'image') and self.image != None:
+            self.image.addToScreen(self.game.screen)
 
     def resolve(self):
         for struggle in self.struggles:

@@ -1,6 +1,6 @@
 import random as rnd
 from util import *
-from cardheap import CardHeap, Deck
+from cardheap import CardHeap, Deck, Hand
 
 
 
@@ -8,8 +8,8 @@ class Board:
     # A player's board
     # (not the whole game board)
     def __init__(self):
-        self.characters = []
-        self.supports = []
+        self.characters = CardHeap()
+        self.supports = CardHeap()
 
     #-- Information
     def cards(self):
@@ -96,13 +96,13 @@ class Player:
     def __init__(self, name=''):
         self.name = name
         self.game = None
-        self.hand = []
         self.deck = Deck("%s's Deck" % self.name)
         self.board = Board()
         self.domains = [Domain('Domain1'),
                         Domain('Domain2'),
                         Domain('Domain3')]
         self.discardPile = CardHeap()
+        self.hand = Hand(self)
         
     #-- Reports
     def handReport(self):
@@ -141,8 +141,7 @@ class Player:
         return players[0]
 
     def randHandCard(self):
-        cardpos = rnd.choice(range(self.nCards()))
-        return self.hand[cardpos]
+        return rnd.choice(self.hand)
 
 
     
@@ -172,7 +171,12 @@ class Player:
     def draw(self, n=1):
         for i in range(n):
             card = self.deck.pop()
-            self.hand.append(card)
+            if hasattr(self.game, 'screen'):
+                card.setScreen(self.game.screen)
+            self.hand.add(card)
+    
+    def drawHandOnScreen(self):
+        self.hand.draw()
 
     def payCost(self, card, domain):
         if domain is None:
@@ -191,9 +195,6 @@ class Player:
             domain.drain()
         
     def play(self, card, domain):
-        # pays the cost and removes card from hand.
-        # the card goes nowhere, you can't call this by itself.
-        # it must be followed by code about where the card ends up.
         if card not in self.hand:
             raise KeyError("This card is not in your hand")
         elif card.cost == 0 and domain is not None:
@@ -210,6 +211,8 @@ class Player:
 
     def useDeck(self, deck):
         self.deck = deck
+        for card in deck:
+            card.owner = self
 
     def wound(self, character):
         character.wounds += 1

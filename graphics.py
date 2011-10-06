@@ -21,7 +21,7 @@ class Screen(object):
         self.size = self.width, self.height = resolution
         self.images = []
         self.drawnImages = []
-        
+        self.window = ZoomWindow(self)
 
     def addImage(self, item):
         if isinstance(item, Image):
@@ -41,6 +41,30 @@ class Screen(object):
 
     def update(self, *args, **kwargs):
         pygame.display.update(*args, **kwargs)
+
+    def readClick(self):
+        while 1:
+
+            # Zoom Window (mouse hover)
+            self.window.clear()
+            for card in self.drawnImages:
+                if card.within(pygame.mouse.get_pos()):
+                    self.window.show(card)
+            self.update()
+
+            # Read Input
+            for event in pygame.event.get():
+
+                # window closed
+                if event.type == pygame.QUIT:
+                    sys.exit()
+
+                # click
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    return event.pos
+
+
+
 
 
 class Image(object):
@@ -159,28 +183,6 @@ class ZoomWindow(Image):
         self.screen.blit(self.screen.background.subsurface(self.rect),self.rect)
     
 
-def readClick(window):
-    while 1:
-
-
-        # Zoom Window (mouse hover)
-        window.clear()
-        for card in window.screen.drawnImages:
-            if card.within(pygame.mouse.get_pos()):
-                window.show(card)
-        window.screen.update()
-
-        # Read Input
-        for event in pygame.event.get():
-
-            # window closed
-            if event.type == pygame.QUIT:
-                sys.exit()
-
-            # click
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                return event.pos
-
 
     
 
@@ -205,7 +207,7 @@ if __name__ == '__main__':
 
     sources['events'] = ("Events/med_gallery_38_313098.jpg",)
 
-    sources['turned card'] = ("Cards/cardBackBig.jpg")
+    sources['turned card'] = ("Cards/cardBack.jpg")
 
 
     sources['resolutions'] = ((1280,600),   #0
@@ -362,17 +364,17 @@ if __name__ == '__main__':
     # DEMONSTRATE!
 
     drawAll(8)
-    readClick(window)
+    screen.readClick()
     drawAll(5, showResources=True)
-    readClick(window)
+    screen.readClick()
     drawAll(2, showResources=True)
-    readClick(window)
+    screen.readClick()
     drawAll(4)
-    readClick(window)
+    screen.readClick()
     drawAll(5)
-    readClick(window)
+    screen.readClick()
     drawAll(8)
-    readClick(window)
+    screen.readClick()
 
 
 

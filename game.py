@@ -7,13 +7,8 @@ import random as rnd
 import numpy.random
 poisson = numpy.random.poisson
 
-
-
-
-
-
-# GAME IMPORTS
 from util import *
+from layout import *
 from AI import AI
 from story import Story
 from card import Character, Event, Support
@@ -64,16 +59,25 @@ class Game:
                           self.Player1.boardReport()])
 
     #-- Actions
-    def drawStory(self, storyslot):
+    def drawStoryCard(self, storyslot):
         story = self.storydeck.pop()
         story.enterGame(self, storyslot)
 
     
     def initiateStories(self):
-        self.drawStory(0)
-        self.drawStory(1)
-        self.drawStory(2)
+        self.drawStoryCard(0)
+        self.drawStoryCard(1)
+        self.drawStoryCard(2)
 
+    def drawStories(self):
+        storypanelwidth = self.screen.width - 3*CARDHEIGHT + 2*SPACEBETWEENSTORIES - RIGHTPANELWIDTH - DOMAINPANELWIDTH
+        x = DOMAINPANELWIDTH + storypanelwidth//2
+        y = self.screen.height//2 - CARDWIDTH//2
+        step = CARDHEIGHT + SPACEBETWEENSTORIES
+        for i in range(3):
+            pos = (x + i*(step), y)
+            self.stories[i].image.draw(pos)
+            
 
 
 

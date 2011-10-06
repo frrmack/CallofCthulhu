@@ -1,5 +1,7 @@
 from card import Card
 from util import *
+from layout import CARDWIDTH, CARDHEIGHT, CARDBACKIMAGE, \
+                   HANDMAXWIDTH, MAXHANDSTEP, MINHANDSTEP
 
 class CardHeap(list):
     # A pile of cards
@@ -22,10 +24,9 @@ class Deck(CardHeap):
 
 
 class Hand(CardHeap):
-    def __init__(self, player=None, pos=None):
+    def __init__(self, player=None):
         self.player = player
-        self.pos = pos
-        if player != None:
+        if player != None and player.game != None:
             self.screen = self.player.game.screen
         
 
@@ -35,8 +36,7 @@ class Hand(CardHeap):
 
     # These should be set in layout.py
     def get_pos(self):
-        CARDWIDTH = 112
-        CARDHEIGHT = 160
+        self.screen = self.player.game.screen
         x = self.screen.width - CARDWIDTH
         if self.player.position == "Player 1":
             y = self.screen.height - CARDHEIGHT
@@ -47,13 +47,29 @@ class Hand(CardHeap):
         return (x,y)
 
     def draw(self):
-        HANDMAXWIDTH = 224.
-        MAXHANDSTEP = 75
-        MINHANDSTEP = 20
-        x,y = self.pos = self.get_pos
+        self.screen = self.player.game.screen
+        x,y = self.pos = self.get_pos()
         step = toInt( 1.*HANDMAXWIDTH / (len(self)-1) )
         step = trunc(step, top=MAXHANDSTEP, bottom=MINHANDSTEP)
-        for i in range(len(self)):
-            pos = (x-step*i, y)
+
+        if self.player.position == "Player 1":  #show cards
+            for i in range(len(self)-1, -1, -1):
+                pos = (x-step*i, y)
+                self[i].image.draw(pos)
+                if i!= len(self)-1:
+                    self[i+1].image.rect[2] -= CARDWIDTH - step # clip rectangle (for click accuracy)
+        
+        elif self.player.position == "Player 2": #don't show cards
+            hiddenCard = Card('hidden', CARDBACKIMAGE)
+            hiddenCard.setScreen(self.screen)
+            for i in range(len(self)-1, -1, -1):
+                pos = (x-step*i, y)
+                hiddenCard.image.draw(pos)
+                
+
+    def clear(self):
+        self.screen = self.player.game.screen
+        self.screen.blit(self.screen.background.subsurface(self.rect),self.rect)
+
 
 
