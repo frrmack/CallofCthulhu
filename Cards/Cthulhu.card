@@ -1,0 +1,22 @@
+Name: Cthulhu
+Flavor: The Great Old One 
+Type: Character 
+Faction: Cthulhu 
+Cost: 6 
+Skill: 8 
+Icons: (T)(T)(C)(C)(A) 
+Game Text: 
+~ Ancient One 
+~ Villainous. Invulnerability. 
+~ Forced Response: After a player draws cards during his draw phase, he must sacrifice a character, if able. 
+Subtypes: Ancient One.
+Keywords: Villainous. Invulnerability.
+Set: Core 
+Number: 41 
+Illustrator: James Ryman
+Image: gallery_38_80091.jpg
+Actions:
+Disrupts:
+Responses:
+Forced Responses: eachPlayerSacrificesOneCharAfterDraw
+
