@@ -10,7 +10,7 @@ class Domain(object):
         if hasattr(self.player, 'game') and \
                 hasattr(self.player.game, 'screen'):
             self.screen = self.player.game.screen
-            self.image = CardImage(CARDBACKIMAGE, self.screen)
+            self.image = DomainImage(self.screen)
 
     def __repr__(self):
         text= self.name + ' [%i]' % self.totalRes()
@@ -49,10 +49,16 @@ class Domain(object):
         if not self.drained:
             self.drained = True
         else:
-            raise KeyError("Domain already drained.")
+            raise RuleError("Domain already drained.")
+        if graphicsOn(self.player):
+            self.image.drain()
+            self.redraw()
             
     def refresh(self):
         self.drained = False
+        if graphicsOn(self.player):
+            self.image.refresh()
+            self.redraw()
 
 
     #-- Graphics
@@ -63,6 +69,7 @@ class Domain(object):
             self.resources[i].image.draw(pos)
         self.image.draw(self.pos)
         self.rect = self.screen.clipRectWithin(self.image.rect)
+        self.image.rect = self.rect
         self.rect[2] += RESOURCEBAR*len(self.resources)
 
     def clear(self):
@@ -82,9 +89,9 @@ class Domain(object):
 class DomainPanel(object):
     def __init__(self, player):
         self.player=player
-        self.domains = [Domain('Domain1'),
-                        Domain('Domain2'),
-                        Domain('Domain3')]
+        self.domains = [Domain(player, 'Domain 1'),
+                        Domain(player, 'Domain 2'),
+                        Domain(player, 'Domain 3')]
         self.cardwidth = CARDWIDTH
         self.cardheight = CARDHEIGHT
 
@@ -97,7 +104,7 @@ class DomainPanel(object):
         elif self.player.position == "Player 2":
             y = 0
         else:
-            raise KeyError("Only available player positions are Player 1 and Player 2.")
+            raise RuleError("Only available player positions are Player 1 and Player 2.")
         return (x,y)
 
     def draw(self):
@@ -106,7 +113,7 @@ class DomainPanel(object):
             domain = self.domains[i]
             if not hasattr(domain, 'image'):
                 domain.screen = self.player.game.screen
-                domain.image = DomainImage(CARDBACKIMAGE, domain.screen)
+                domain.image = DomainImage(domain.screen)
             if self.player.position == "Player 1":
                 pos = (x, y-i*(self.cardwidth+SPACEBETWEENDOMAINS))
                 domain.pos = pos
@@ -114,9 +121,10 @@ class DomainPanel(object):
                 pos = (x, y+i*(self.cardwidth+SPACEBETWEENDOMAINS))
                 domain.pos = pos
             else:
-                raise KeyError("Only available player positions are Player 1 and Player 2.")
+                raise RuleError("Only available player positions are Player 1 and Player 2.")
             domain.image.draw(pos)
             domain.rect = domain.screen.clipRectWithin(domain.image.rect)
+            domain.image.rect = domain.rect
 
 
 

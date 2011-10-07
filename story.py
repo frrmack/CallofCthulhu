@@ -210,7 +210,7 @@ class Story(Card):
 
     def enterGame(self, game, storyslot):
         if storyslot not in [0,1,2]:
-            raise KeyError("This is not a valid story slot")
+            raise RuleError("This is not a valid story slot")
         game.stories[storyslot] = self
         self.game = game
         self.Player1 = game.Player1

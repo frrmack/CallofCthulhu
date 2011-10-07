@@ -16,42 +16,42 @@ def restoreOneInsane(Player):
     if isAI(Player):
         return Player.restoreOneInsane()
     else:
-        raise KeyError("HUMAN PLAYERS NOT CODED YET")
+        raise RuleError("HUMAN PLAYERS NOT CODED YET")
 
 
 def attachOneCardToADomain(Player):
     if isAI(Player):
         return Player.attachOneCardToADomain()
     else:
-        raise KeyError("HUMAN PLAYERS NOT CODED YET")
+        raise RuleError("HUMAN PLAYERS NOT CODED YET")
     
 
 def playCardFromHand(Player):
     if isAI(Player):
         return Player.playCardFromHand()
     else:
-        raise KeyError("HUMAN PLAYERS NOT CODED YET")
+        raise RuleError("HUMAN PLAYERS NOT CODED YET")
 
 
 def commitCharacterToStoryWhenActive(Player):
     if isAI(Player):
         return Player.commitCharacterToStoryWhenActive()
     else:
-        raise KeyError("HUMAN PLAYERS NOT CODED YET")
+        raise RuleError("HUMAN PLAYERS NOT CODED YET")
 
 
 def commitCharacterToStoryWhenDefending(Player):
     if isAI(Player):
         return Player.commitCharacterToStoryWhenDefending()
     else:
-        raise KeyError("HUMAN PLAYERS NOT CODED YET")
+        raise RuleError("HUMAN PLAYERS NOT CODED YET")
     
 
 def chooseOneFromStoryToGoInsane(Player):
     if isAI(Player):
         return Player.chooseOneFromStoryToGoInsane()
     else:
-        raise KeyError("HUMAN PLAYERS NOT CODED YET")
+        raise RuleError("HUMAN PLAYERS NOT CODED YET")
 
 
 

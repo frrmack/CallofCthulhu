@@ -13,9 +13,6 @@ class CardHeap(list):
     def add(self, card):
         self.append(card)
 
-    def remove(self, card):
-        list.remove(self, card)
-
     def putInBottom(self, card):
         self.insert(0, card)
 
@@ -30,9 +27,18 @@ class Deck(CardHeap):
 class Hand(CardHeap):
     def __init__(self, player=None):
         self.player = player
+        self.rect = pygame.Rect(0,0,0,0)
         if player != None and player.game != None:
             self.screen = self.player.game.screen
             self.createHiddenCards()
+
+    
+    def add(self, card):
+        CardHeap.add(self,card)
+        if graphicsOn(self.player):
+            self.screen = self.player.screen
+            self.redraw()
+
 
     def remove(self, card):
         list.remove(self, card)
@@ -40,6 +46,8 @@ class Hand(CardHeap):
             self.screen = self.player.screen
             if card.image in self.screen.drawnImages:
                 self.screen.drawnImages.remove(card.image)
+            self.redraw()
+
     def belongToPlayer(self, player):
         self.player = player
         self.screen = self.player.game.screen
@@ -58,14 +66,17 @@ class Hand(CardHeap):
         elif self.player.position == "Player 2":
             y = 0
         else:
-            raise KeyError("Only available player positions are Player 1 and Player 2.")
+            raise RuleError("Only available player positions are Player 1 and Player 2.")
         return (x,y)
 
     def draw(self):
         self.screen = self.player.game.screen
         x,y = self.pos = self.get_pos()
-        step = toInt( 1.*HANDMAXWIDTH / (len(self)-1) )
-        step = trunc(step, top=MAXHANDSTEP, bottom=MINHANDSTEP)
+        if len(self) == 1:
+            step = 0
+        else:
+            step = toInt( 1.*HANDMAXWIDTH / (len(self)-1) )
+            step = trunc(step, top=MAXHANDSTEP, bottom=MINHANDSTEP)
         self.rect = pygame.Rect(x-(len(self)-1)*step,y,CARDWIDTH+(len(self)-1)*step,CARDHEIGHT)
 
         if self.player.position == "Player 1":  #show cards
@@ -90,14 +101,19 @@ class Hand(CardHeap):
                 if card in self.screen.drawnImages:
                     self.screen.drawnImages.remove(card.image)
         elif self.player.position == "Player 2":
-            for i in range(len(self)):
-                card = hiddenCards[i]
-                if card.image in self.screen.drawnImages:
-                    self.screen.drawnImages.remove(card.image)
+            if hasattr(self,"hiddenCards"):
+                for i in range(len(self)):
+                    card = self.hiddenCards[i]
+                    if card.image in self.screen.drawnImages:
+                        self.screen.drawnImages.remove(card.image)
         else:
-            raise KeyError("Only available player positions are Player 1 and Player 2.")
+            raise RuleError("Only available player positions are Player 1 and Player 2.")
 
     def redraw(self):
         self.clear()
         self.draw()
+
+
+class DiscardPile(CardHeap):
+    pass
 

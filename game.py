@@ -135,18 +135,23 @@ def parseCardFile(cardFileName):
         icons = fields["Struggle Icons"].lstrip('(').rstrip(')')
         for icon in icons.split(')('):
             if   icon == 'T':
-                card.appendTerrorStruggle()
+                if cardtype == "Story":
+                    card.appendTerrorStruggle()
             elif icon == 'C':
-                card.appendCombatStruggle()
+                if cardtype == "Story":
+                    card.appendCombatStruggle()
             elif icon == 'A':
-                card.appendArcaneStruggle()
+                if cardtype == "Story":
+                    card.appendArcaneStruggle()
             elif icon == 'I':
-                card.appendInvestigationStruggle()
-        card.appendSkillStruggle()
+                if cardtype == "Story":
+                    card.appendInvestigationStruggle()
+        if cardtype == "Story":
+            card.appendSkillStruggle()
     if "Subtypes" in fields:
         card.subtypes = fields["Subtypes"].rstrip('.').split('.')
     if "Keywords" in fields:
-        card.keywords = fields["Subtypes"].rstrip('.').split('.')
+        card.keywords = fields["Keywords"].rstrip('.').split('.')
     if "Set" in fields:
         card.set = fields["Set"]
     if "Number" in fields:

@@ -1,6 +1,6 @@
 import random as rnd
 from util import *
-from cardheap import CardHeap, Deck, Hand
+from cardheap import CardHeap, Deck, Hand, DiscardPile
 from domain import DomainPanel
 
 
@@ -34,8 +34,11 @@ class Board:
         else:
             msg = "Only characters and certain support cards\n" +\
                   "can be played on a board"
-            raise KeyError(msg)
+            raise RuleError(msg)
 
+    #-- Graphics
+    def get_pos(self):
+        pass
 
 
 
@@ -95,25 +98,26 @@ class Player:
     #~~ Actions
     def attach2Domain(self, card, domain):
         if card not in self.hand:
-            raise KeyError("This card is not in your hand")
+            raise RuleError("This card is not in your hand")
         elif domain not in self.domains:
-            raise KeyError("This is not one of your domains")
+            raise RuleError("This is not one of your domains")
         else:
             self.hand.remove(card)
             domain.resources.append(card)
         if graphicsOn(self):
             self.hand.redraw()
+            card.image.turnLeft()
             domain.redraw()
-            self.screen.update()
+            #self.screen.update()
 
 
     def commit(self, card, story):
         if card not in self.board.characters:
-            raise KeyError("This character is not on your board")
+            raise RuleError("This character is not on your board")
         elif story not in self.game.stories:
-            raise KeyError("This story is not on the board")
+            raise RuleError("This story is not on the board")
         elif card.isExhausted():
-            raise KeyError("This character is exhausted. It cannot commit to a story.")
+            raise RuleError("This character is exhausted. It cannot commit to a story.")
         else:
             self.board.characters.remove(card)
             card.exhaust()
@@ -125,9 +129,6 @@ class Player:
             if hasattr(self.game, 'screen'):
                 card.setScreen(self.game.screen)
             self.hand.add(card)
-    
-    def drawHandOnScreen(self):
-        self.hand.draw()
 
     def drawDomainsOnScreen(self):
         self.domainPanel.draw()
@@ -136,23 +137,19 @@ class Player:
         if domain is None:
             pass # do not drain anything
         elif domain not in self.domains:
-            raise KeyError("This domain does not belong to you")
+            raise RuleError("This domain does not belong to you")
         elif domain.isDrained():
-            raise KeyError("This domain has already been drained")
+            raise RuleError("This domain has already been drained")
         elif card.cost > domain.totalRes():
-            print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-            print 'cost',card.cost, '  domain tot', domain.totalRes()
-            print card
-            print domain.report()
-            raise KeyError("This domain cannot afford this card")
+            raise RuleError("This domain cannot afford this card")
         else:
             domain.drain()
         
     def play(self, card, domain):
         if card not in self.hand:
-            raise KeyError("This card is not in your hand")
+            raise RuleError("This card is not in your hand")
         elif card.cost == 0 and domain is not None:
-            raise KeyError("Cannot drain a domain for 0 cost")
+            raise RuleError("Cannot drain a domain for 0 cost")
         else:
             self.payCost(card, domain)
             self.hand.remove(card)
@@ -161,7 +158,7 @@ class Player:
             elif card.category == 'event':
                 self.discardPile.add(card)
             else:
-                raise KeyError("Don't know how to play category %s" % card.category)
+                raise RuleError("Don't know how to play category %s" % card.category)
 
     def useDeck(self, deck):
         self.deck = deck
@@ -175,14 +172,14 @@ class Player:
 
     def destroy(self, card):
         if card.controller != self:
-            raise KeyError("You can only destroy cards under your control")
+            raise RuleError("You can only destroy cards under your control")
         # remove from current place
         if card.isOnBoard(self.board):
             self.board.remove(card)
         elif card.isInHand(self):
             self.hand.remove(card)
         else:
-            raise KeyError("You cannot destroy that card")
+            raise RuleError("You cannot destroy that card")
         # put in your discard pile
         self.discardPile.add(card)
         

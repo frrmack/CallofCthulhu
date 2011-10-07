@@ -1,5 +1,4 @@
 import sys, pygame
-from copy import copy
 from util import *
 from layout import *
 
@@ -46,11 +45,21 @@ class Screen(object):
 
     def clipRectWithin(self, rect):
         x,y,w,h = rect
-        x = trunc(x, top=self.width, bottom=0)
-        y = trunc(y, top=self.height, bottom=0)
-        w = trunc(w, top=self.width-x)
-        h = trunc(w, top=self.height-y)
-        return pygame.Rect(x,y,w,h)
+        X = trunc(x, top=self.width, bottom=0)
+        Y = trunc(y, top=self.height, bottom=0)
+        W = w
+        if x > self.width:
+            W = w - (self.width-x)
+        elif x < 0:
+            W = w + x
+        W = trunc(W, bottom=0)
+        H = h
+        if y > self.height:
+            H = h - (self.height-y)
+        elif y < 0:
+            H = H + y
+        H = trunc(H, bottom=0)
+        return pygame.Rect(X,Y,W,H)
 
 
     def activateZoomWindow(self):
@@ -63,7 +72,7 @@ class Screen(object):
     def readClick(self):
         while 1:
 
-            self.activateZoomWindow
+            self.activateZoomWindow()
             self.update()
 
             # Read Input
@@ -119,7 +128,7 @@ class Image(object):
         self.screen.drawnImages.append(self)
         return self
         
-    def erase(self):
+    def clear(self):
         self.screen.blit(self.screen.background.subsurface(self.rect),self.rect)
         self.rect = pygame.Rect(0,0,0,0)
         self.pos = 0,0
@@ -148,12 +157,22 @@ class CardImage(Image):
     def drawZoomed(self, pos):
         self.drawSurface(self.bigSurface, pos)
 
+
+    def flipCard(self, cardBackFile=CARDBACKIMAGE):
+        if not hasattr(self, "backSurface"):
+            self.backSurface = pygame.image.load(cardBackFile).convert()
+        self.surface, self.backSurface = self.backSurface, self.surface
+
     def turnRight(self):
         self.surface = pygame.transform.rotate(self.surface,270)
+        self.rect = self.surface.get_rect().move(self.pos)
+        self.width, self.height = self.size = self.surface.get_size()
         return self
 
     def turnLeft(self):
         self.surface = pygame.transform.rotate(self.surface,90)
+        self.rect = self.surface.get_rect().move(self.pos)
+        self.width, self.height = self.size = self.surface.get_size()
         return self
 
 class StoryImage(CardImage):
@@ -162,9 +181,20 @@ class StoryImage(CardImage):
     
     
 class DomainImage(CardImage):
-    def __init__(self, fileName, screen=None):
-        CardImage.__init__(self, fileName, screen)
+    def __init__(self, screen=None):
+        CardImage.__init__(self, CARDBACKIMAGE, screen)
         self.turnRight()
+        self.freshSurface = self.surface
+        self.drainedSurface = grayscaleCopy(self.surface)
+        # self.drainedSurface = pygame.image.load(DRAINEDDOMAINIMAGE).convert()
+        # self.drainedSurface = scale(self.drainedSurface, size=self.regularSize)
+        # self.drainedSurface = pygame.transform.rotate(self.drainedSurface,270)
+
+    def drain(self):
+        self.surface = self.drainedSurface
+
+    def refresh(self):
+        self.surface = self.freshSurface
 
 
 class ZoomWindow(Image):
@@ -186,7 +216,7 @@ class ZoomWindow(Image):
 
     def show(self, cardImage):
         self.clear()
-        self.surface = copy(cardImage.bigSurface)
+        self.surface = cardImage.bigSurface.copy()
         self.rect = self.surface.get_rect()
         self.size = self.width, self.height = cardImage.surface.get_size()
         self.pos = self.get_pos(self.surface)
@@ -344,8 +374,7 @@ if __name__ == '__main__':
 
         print '  User Domains'
         # User Domains
-        img = sources['turned card']
-        userDomains  = [DomainImage(img, screen) for domain in range(3)]
+        userDomains  = [DomainImage(screen) for domain in range(3)]
         x = -100
         y = screen.height - 112
         if showResources:
@@ -361,8 +390,7 @@ if __name__ == '__main__':
 
         print '  Enemy Domains'
         # Enemy Domains
-        img = sources['turned card']
-        enemyDomains = [DomainImage(img, screen) for domain in range(3)]
+        enemyDomains = [DomainImage(screen) for domain in range(3)]
         x = -100
         y = 0
         for i in range(len(enemyDomains)):

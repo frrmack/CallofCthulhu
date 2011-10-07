@@ -1,5 +1,14 @@
 import pygame
 
+# EXCEPTIONS
+class RuleError(Exception):
+    pass
+
+class GameError(Exception):
+    pass
+
+
+
 # TOOLS
 def clear(n=50):
     print '\n'*n
@@ -31,6 +40,18 @@ def graphicsOn(obj):
         return True
     else:
         return False
+
+def grayscaleCopy(surface):
+    surf = surface.copy()
+    width, height = surf.get_size()
+    for x in range(width):
+        for y in range(height):
+            red, green, blue, alpha = surf.get_at((x, y))
+            L = 0.3 * red + 0.59 * green + 0.11 * blue
+            gs_color = (L, L, L, alpha)
+            surf.set_at((x, y), gs_color)
+    return surf
+
 
 
 def scale(surface, ratio=None, size=None, width=None, height=None):

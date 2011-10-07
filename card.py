@@ -57,15 +57,28 @@ class Card:
     #-- Actions
     def exhaust(self):
         if not self.isReady():
-            raise KeyError("You can only exhaust a ready character")
+            raise RuleError("You can only exhaust a ready character")
         else:
             self.state = 'exhausted'
+        if graphicsOn(self.owner):
+            self.image.clear()
+            self.image.turnRight()
+            self.image.draw(self.pos)
+            self.owner.screen.update()
+
 
     def ready(self):
         if not self.isExhausted():
-            raise KeyError("You can only ready an exhausted character")
+            raise RuleError("You can only ready an exhausted character")
         else:
             self.state = 'ready'
+        if graphicsOn(self.owner):
+            self.image.clear()
+            self.image.turnLeft()
+            self.image.draw(self.pos)
+            self.owner.screen.update()
+            
+
 
     def setScreen(self, screen):
         self.screen = screen
@@ -141,18 +154,20 @@ class Character(Card):
     #-- Actions
     def goInsane(self):
         if self.isInsane():
-            raise KeyError("This character is already insane.")
+            raise RuleError("This character is already insane.")
         else:
             self.state = 'insane'
 
     def restore(self):
         if not self.isInsane():
-            raise KeyError("You can only restore insane characters")
+            raise RuleError("You can only restore insane characters")
         else:
             self.state = 'exhausted'
-
-
-
+        if graphicsOn(self.owner):
+            self.image.clear()
+            self.image.flipCard()
+            self.draw(self.pos)
+            self.owner.screen.update()
 
 
 

@@ -1,4 +1,5 @@
 import sys, time
+import glob
 import pygame
 import random as rnd
 import numpy.random
@@ -89,9 +90,10 @@ try:
         # Cardtype = [Character, Event, Support][poisson(0.5) % 3]
         # redcard = Cardtype( 'Red Card %i'%(n+1), randomize=True )
         # bluecard = Cardtype( 'Blue Card %i'%(n+1), randomize=True )
-        card = parseCardFile("Cards/Cthulhu.card")
+        cardfile = rnd.choice(glob.glob('Cards/*.card'))
+        card = parseCardFile(cardfile)
         Deck1.add(card)
-        card = parseCardFile("Cards/Cthulhu.card")
+        card = parseCardFile(cardfile)
         Deck2.add(card)
         
     P1.useDeck(Deck1)
@@ -133,20 +135,110 @@ try:
     print '%s DRAWS 8 cards\n' % P2.name
     P1.draw(8)
     P2.draw(8)
-    P1.drawHandOnScreen()
-    P2.drawHandOnScreen()
-    screen.update()
+
+    #screen.readClick()
 
     # Attach 1 card to each domain
     for ply in [P1, P2]:
         for i in range(3):
             card, domain = getDecision.attachOneCardToADomain(ply)
+            domain = ply.domains[i]
             ply.attach2Domain(card, domain)
     
+    #screen.readClick()
 
-    screen.readClick()
+    # P1 starts 
+    ActivePlayer = P1
+    DefendingPlayer = P2
 
 
+    # PLAY FOR A LIMITED NUMBER OF TURNS (for now, coding and debugging)
+
+    for turn in range(1):
+        printTurnHeader("__________ START %s's TURN ___________\n" % ActivePlayer.name)
+
+
+        # REFRESH PHASE
+        # Ready all exhausted cards
+        # Restore 1 insane character 
+        # Refresh Domains
+        printPhaseHeader('--- REFRESH PHASE -------------------------------\n')
+
+        for card in ActivePlayer.board.cardsOfState('exhausted'):
+            print ActivePlayer.name,'READIES',card
+            card.ready()
+
+        for domain in ActivePlayer.domains:
+            if domain.isDrained():
+                print ActivePlayer.name,'REFRESHES',domain
+                domain.refresh()
+
+        if len(ActivePlayer.board.cardsOfState('insane')) > 0:
+            card = getDecision.restoreOneInsane(ActivePlayer)
+            if card is not None:
+                print ActivePlayer.name,'RESTORES',card
+                card.restore()
+
+
+        #screen.readClick()
+        print
+
+        # ACTIONS
+
+        # DRAW PHASE
+        # Draw 2 cards
+        printPhaseHeader('--- DRAW PHASE ----------------------------------\n')
+        if turn == 0:
+            nCards, grammar = 1, 'card'
+        else:
+            nCards, grammar = 2, 'cards'
+        ActivePlayer.draw(nCards)
+        print ActivePlayer.name, 'draws %i %s' % (nCards,grammar),'\n'
+        print ActivePlayer.handReport(), '\n'
+
+
+        #screen.readClick()
+
+        # ACTIONS
+
+        # RESOURCE PHASE
+        # Attach one card to a domain
+        printPhaseHeader('--- RESOURCE PHASE ------------------------------\n')
+
+        # get decision
+        card, domain = getDecision.attachOneCardToADomain(ActivePlayer)
+
+
+        print ActivePlayer.name, 'ATTACHES', card, '\n\t TO', domain, '\n'
+        ActivePlayer.attach2Domain(card, domain)
+
+        # Report
+        print ActivePlayer.domainReport(), '\n'
+
+        # ACTIONS
+
+
+        # OPERATIONS PHASE
+        # Play cards from your hand (also actions may take place)
+        printPhaseHeader('--- OPERATIONS PHASE -----------------------------\n')
+
+        while True:
+            # keep playing until you choose no card to play
+            card, target, domain = getDecision.playCardFromHand(ActivePlayer)
+
+            if card is None:
+                break 
+
+            # target stuff is not coded yet
+
+            if domain is None:
+                print ActivePlayer.name, 'PLAYS', card, '\n'
+            else:
+                print ActivePlayer.name, 'PLAYS %s USING %s \n' % (card, domain)
+
+            ActivePlayer.play(card, domain)
+
+        screen.readClick()
 
 
 except:
