@@ -103,7 +103,7 @@ def parseCardFile(cardFileName):
     name      = fields["Name"]
     cardtype  = fields["Type"]
     if cardtype in ("Character", "Support", "Event"):
-        imageFile = "Cards/" + fields["Image"]
+        imageFile = "Images/" + fields["Image"]
     elif cardtype == "Story":
         imageFile = "Stories/" + fields["Image"]
     if cardtype not in cardOfType:

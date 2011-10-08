@@ -153,10 +153,22 @@ class CardImage(Image):
         Image.__init__(self, pygame.image.load(fileName).convert(), screen)
         self.bigSurface = scale(self.surface, size=self.zoomSize)
         self.surface = scale(self.surface, size=self.regularSize)
+        self.backSurface = pygame.image.load(cardBackFile).convert()
+        self.bigBackSurface = scale(self.backSurface, size=self.zoomSize)
+        self.backSurface = scale(self.backSurface, size=self.regularSize)
+
+        
                                 
     def drawZoomed(self, pos):
         self.drawSurface(self.bigSurface, pos)
 
+    def hide(self):
+        self.surface, self.backSurface = self.backSurface, self.surface
+        self.bigSurface, self.bigBackSurface = self.bigBackSurface, self.bigSurface
+
+    def unhide(self):
+        # swap again
+        self.hide()
 
     def flipCard(self, cardBackFile=CARDBACKIMAGE):
         if not hasattr(self, "backSurface"):
@@ -241,16 +253,16 @@ if __name__ == '__main__':
                           "Stories/med_gallery_38_166479.jpg",
                           "Stories/gallery_38_370341.jpg")
 
-    sources['characters'] = ("Cards/med_gallery_38_29631.jpg",
-                             "Cards/med_gallery_38_54002.jpg",
-                             "Cards/gallery_38_80091.jpg",
-                             "Cards/med_gallery_38_88054.jpg",
-                             "Cards/dagonBig.jpg",
-                             "Cards/yGolonacBig.jpg")
+    sources['characters'] = ("Images/med_gallery_38_29631.jpg",
+                             "Images/med_gallery_38_54002.jpg",
+                             "Images/gallery_38_80091.jpg",
+                             "Images/med_gallery_38_88054.jpg",
+                             "Images/dagonBig.jpg",
+                             "Images/yGolonacBig.jpg")
 
     sources['events'] = ("Events/med_gallery_38_313098.jpg",)
 
-    sources['turned card'] = ("Cards/cardBack.jpg")
+    sources['turned card'] = ("Images/cardBack.jpg")
 
 
     sources['resolutions'] = ((1280,600),   #0
