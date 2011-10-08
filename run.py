@@ -22,26 +22,30 @@ if len(sys.argv) > 1:
     SEED = int(sys.argv[1])
 else:
     SEED = int(time.time())
+rnd.seed(SEED)
+numpy.random.seed(SEED)
+print 'SEED:', SEED
 
 
-resolutions = ((1280,600),   #0
-               (1280,800),   #1
-               (1280,1024),  #2
-               (1268,970),   #3
-               (1440,900),   #4
-               (1920,1200))  #5
+
+resolutions = ((1024,600),   #0 Eee-PC Netbook
+               (1024,800),   #1 LowRes
+               (1280,1024),  #2 Standard 5:4 Display
+               (1268,970),   #3 Window filling a standard 1280x1024 Display
+               (1440,900),   #4 Macbook Pro 15" (WideScreen)
+               (1920,1200))  #5 Standard 16:10 HD Display, Macbook Pro 17" (WideScreen)
 
 enableFullscreen  = (False, #0
                      True)  #1
 
 backgrounds = ("cthulhu_1440x900.jpg",               #0
-               "cthulhu_1920x1200.jpg",              #1
+               "cthulhu_1920x1200.jpg",              #1 Cool Cthulhu Illustration
                "dark_backgr_1920x1200.jpg",          #2
                "minimalistic_Symbol_1920x1200.jpg",  #3
                "old_inn_1920x1200.jpg",              #4
-               "tentacles_1920x1200.jpg",            #5
-               "whiteWood_1920x1200.jpg",            #6
-               "wood_1440x1050.jpg",                 #7
+               "tentacles_1920x1200.jpg",            #5 Cool Tentacle Illustration
+               "whiteWood_1920x1200.jpg",            #6 White
+               "wood_1440x1050.jpg",                 #7 Good Table
                "woodB_1920x1200.jpg",                #8
                "woodC_1920x1200.jpg",                #9
                "woodD_1920x1200.jpg",                #10
@@ -54,7 +58,7 @@ backgrounds = ("cthulhu_1440x900.jpg",               #0
 
 resolution = 3    # 3  4  5
 fullscreen = 0    # 0  0  1
-background = 7    # 7  0  0
+background = 6    # 7  0  0
 
 ###############################
 ###############################
@@ -105,7 +109,8 @@ try:
         # name = rnd.choice('ABCDEFGHIJKLXYZW') + \
         #     rnd.choice('ABCDEFGHIJKLXYZW')
         # storycard = Story( 'Story %s' % name  )
-        storycard = parseCardFile("Stories/Ancient_Apocrypha.card")
+        cardfile = rnd.choice(glob.glob('Stories/*.card'))
+        storycard = parseCardFile(cardfile)
         storydeck.add(storycard)
 
     # NEW GAME SETUP
@@ -136,7 +141,7 @@ try:
     P1.draw(8)
     P2.draw(8)
 
-    #screen.readClick()
+    screen.readClick()
 
     # Attach 1 card to each domain
     for ply in [P1, P2]:
@@ -145,7 +150,7 @@ try:
             domain = ply.domains[i]
             ply.attach2Domain(card, domain)
     
-    #screen.readClick()
+    screen.readClick()
 
     # P1 starts 
     ActivePlayer = P1
@@ -154,7 +159,7 @@ try:
 
     # PLAY FOR A LIMITED NUMBER OF TURNS (for now, coding and debugging)
 
-    for turn in range(1):
+    for turn in range(4):
         printTurnHeader("__________ START %s's TURN ___________\n" % ActivePlayer.name)
 
 
@@ -180,7 +185,7 @@ try:
                 card.restore()
 
 
-        #screen.readClick()
+        screen.readClick()
         print
 
         # ACTIONS
@@ -197,7 +202,7 @@ try:
         print ActivePlayer.handReport(), '\n'
 
 
-        #screen.readClick()
+        screen.readClick()
 
         # ACTIONS
 
@@ -240,10 +245,11 @@ try:
 
         screen.readClick()
 
-
+        
 except:
-    print 'SEED:',SEED
     raise
+finally:
+    print 'SEED:', SEED
 
 
 

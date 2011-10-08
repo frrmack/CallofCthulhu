@@ -1,5 +1,6 @@
 from layout import *
 from graphics import DomainImage
+from util import *
 
 class Domain(object):
     def __init__(self, player, name=''):
@@ -45,6 +46,10 @@ class Domain(object):
 
 
     #-- Actions
+    def addResource(self,card):
+        self.resources.append(card)
+
+
     def drain(self):
         if not self.drained:
             self.drained = True
@@ -69,7 +74,6 @@ class Domain(object):
             self.resources[i].image.draw(pos)
         self.image.draw(self.pos)
         self.rect = self.screen.clipRectWithin(self.image.rect)
-        self.image.rect = self.rect
         self.rect[2] += RESOURCEBAR*len(self.resources)
 
     def clear(self):
@@ -124,7 +128,6 @@ class DomainPanel(object):
                 raise RuleError("Only available player positions are Player 1 and Player 2.")
             domain.image.draw(pos)
             domain.rect = domain.screen.clipRectWithin(domain.image.rect)
-            domain.image.rect = domain.rect
 
 
 

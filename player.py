@@ -50,7 +50,7 @@ class Player:
         self.board = Board()
         self.domainPanel = DomainPanel(self)
         self.domains = self.domainPanel.domains
-        self.discardPile = CardHeap()
+        self.discardPile = DiscardPile(self)
         self.hand = Hand(self)
         
     #-- Reports
@@ -103,7 +103,7 @@ class Player:
             raise RuleError("This is not one of your domains")
         else:
             self.hand.remove(card)
-            domain.resources.append(card)
+            domain.addResource(card)
         if graphicsOn(self):
             self.hand.redraw()
             card.image.turnLeft()

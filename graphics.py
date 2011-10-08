@@ -15,6 +15,7 @@ class Screen(object):
 
         if backgroundFileName != None:
             self.background = pygame.image.load(backgroundFileName).convert()
+            self.background = scale(self.background, size=resolution)
             self.surface.blit(self.background, (0,0))
             pygame.display.flip()
         
@@ -153,9 +154,10 @@ class CardImage(Image):
         Image.__init__(self, pygame.image.load(fileName).convert(), screen)
         self.bigSurface = scale(self.surface, size=self.zoomSize)
         self.surface = scale(self.surface, size=self.regularSize)
-        self.backSurface = pygame.image.load(cardBackFile).convert()
+        self.backSurface = pygame.image.load(CARDBACKIMAGE).convert()
         self.bigBackSurface = scale(self.backSurface, size=self.zoomSize)
         self.backSurface = scale(self.backSurface, size=self.regularSize)
+        self.hidden=False
 
         
                                 
@@ -163,16 +165,23 @@ class CardImage(Image):
         self.drawSurface(self.bigSurface, pos)
 
     def hide(self):
+        # both surface and bigSurface are switched to cardback
+        if self.hidden:
+            raise GameError("Trying to hide already hidden card")
         self.surface, self.backSurface = self.backSurface, self.surface
         self.bigSurface, self.bigBackSurface = self.bigBackSurface, self.bigSurface
+        self.hidden = True
 
     def unhide(self):
+        if not self.hidden:
+            raise GameError("Trying to unhide a non hidden card")
         # swap again
-        self.hide()
+        self.surface, self.backSurface = self.backSurface, self.surface
+        self.bigSurface, self.bigBackSurface = self.bigBackSurface, self.bigSurface
+        self.hidden = False
 
     def flipCard(self, cardBackFile=CARDBACKIMAGE):
-        if not hasattr(self, "backSurface"):
-            self.backSurface = pygame.image.load(cardBackFile).convert()
+        # surface is switched to cardback, bigSurface (zoom image) stays open
         self.surface, self.backSurface = self.backSurface, self.surface
 
     def turnRight(self):
@@ -343,6 +352,8 @@ if __name__ == '__main__':
             pos = (x + 200*i, y)
             stories[i].draw(pos)
 
+        screen.update()
+
         print '  User Hand'
         # User Hand
         userHand  = randomCards(handsize)
@@ -353,6 +364,8 @@ if __name__ == '__main__':
         for i in range(len(userHand)-1,-1,-1):
             pos = (x - step*i, y)
             userHand[i].draw(pos)
+
+        screen.update()
 
         print '  Enemy Hand'
         # Enemy Hand
@@ -365,6 +378,8 @@ if __name__ == '__main__':
             pos = (x - step*i, y)
             enemyHand[i].draw(pos)
 
+        screen.update()
+
         print '  User Discard Pile'
         # User Discard Pile
         userDiscardPile  = map(lambda c: c.scale(0.5), randomCards(2))
@@ -375,14 +390,19 @@ if __name__ == '__main__':
             pos = (x, y - step*i)
             userDiscardPile[i].draw(pos)
 
+        screen.update()
+
         print '  Enemy Discard Pile'
         # Enemy Discard Pile
         enemyDiscardPile = map(lambda c: c.scale(0.5), randomCards(12))
         x = screen.width - 480 + 35
         y = 2
+        step = 13
         for i in range(len(enemyDiscardPile)):
             pos = (x, y+step*i)
             enemyDiscardPile[i].draw(pos)
+
+        screen.update()
 
         print '  User Domains'
         # User Domains
@@ -400,6 +420,8 @@ if __name__ == '__main__':
             pos = (x, y-116*i)
             userDomains[i].draw(pos)
 
+        screen.update()
+
         print '  Enemy Domains'
         # Enemy Domains
         enemyDomains = [DomainImage(screen) for domain in range(3)]
@@ -409,8 +431,6 @@ if __name__ == '__main__':
             pos = (x, y+116*i)
             enemyDomains[i].draw(pos)
 
-        print '  Update'
-        # Update
         screen.update()
 
 

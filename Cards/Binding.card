@@ -1,0 +1,15 @@
+Name: Binding
+
+
+Type: Event
+Faction: Miskatonic University 
+Cost: 1 
+Game Text: 
+~Spell 
+~Action: Choose a character. Until the end of the phase, that character loses ~all of its printed icons. 
+Subtypes: Spell.
+Set: Core 
+Number: 36 
+Illustrator: Thomas Denmark
+Image: gallery_38_337470.jpg
+

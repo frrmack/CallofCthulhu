@@ -102,12 +102,9 @@ def parseCardFile(cardFileName):
     # create card
     name      = fields["Name"]
     cardtype  = fields["Type"]
-    if cardtype in ("Character", "Support", "Event"):
-        imageFile = "Images/" + fields["Image"]
-    elif cardtype == "Story":
-        imageFile = "Stories/" + fields["Image"]
+    imageFile = "Images/" + fields["Image"]
     if cardtype not in cardOfType:
-        raise TypeError("Card type not recognized: %s" % cardtype)
+        raise GameError("Card type not recognized: %s" % cardtype)
     card = cardOfType[cardtype](name, imageFile)
     # put other info in
     card.faction = fields["Faction"]
