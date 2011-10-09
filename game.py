@@ -70,8 +70,8 @@ class Game:
         self.drawStoryCard(2)
 
     def drawStories(self):
-        storypanelwidth = self.screen.width - 3*CARDHEIGHT + 2*SPACEBETWEENSTORIES - RIGHTPANELWIDTH - DOMAINPANELWIDTH
-        x = DOMAINPANELWIDTH + storypanelwidth//2
+        storypanelwidth = self.screen.width - 3*CARDHEIGHT + 2*SPACEBETWEENSTORIES - ZOOMEDCARDHEIGHT - DOMAINWIDTH
+        x = DOMAINWIDTH + storypanelwidth//2
         y = self.screen.height//2 - CARDWIDTH//2
         step = CARDHEIGHT + SPACEBETWEENSTORIES
         for i in range(3):

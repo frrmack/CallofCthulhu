@@ -159,7 +159,7 @@ try:
 
     # PLAY FOR A LIMITED NUMBER OF TURNS (for now, coding and debugging)
 
-    for turn in range(4):
+    for turn in range(10):
         printTurnHeader("__________ START %s's TURN ___________\n" % ActivePlayer.name)
 
 
@@ -242,7 +242,11 @@ try:
                 print ActivePlayer.name, 'PLAYS %s USING %s \n' % (card, domain)
 
             ActivePlayer.play(card, domain)
+            screen.readClick()
 
+        
+        
+        ActivePlayer, DefendingPlayer = DefendingPlayer, ActivePlayer
         screen.readClick()
 
         

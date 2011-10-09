@@ -92,18 +92,10 @@ class Hand(CardHeap):
     def clear(self):
         self.screen = self.player.game.screen
         self.screen.blit(self.screen.background.subsurface(self.rect),self.rect)
-        if self.player.position == "Player 1":
-            for card in self:
-                if card in self.screen.drawnImages:
-                    self.screen.drawnImages.remove(card.image)
-        elif self.player.position == "Player 2":
-            if hasattr(self,"hiddenCards"):
-                for i in range(len(self)):
-                    card = self.hiddenCards[i]
-                    if card.image in self.screen.drawnImages:
-                        self.screen.drawnImages.remove(card.image)
-        else:
-            raise GameError("Only available player positions are Player 1 and Player 2.")
+        for card in self:
+            if card in self.screen.drawnImages:
+                self.screen.drawnImages.remove(card.image)
+
 
     def redraw(self):
         self.clear()

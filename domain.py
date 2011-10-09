@@ -100,9 +100,13 @@ class DomainPanel(object):
         self.cardheight = CARDHEIGHT
 
     #-- Graphics
+    def get_width(self):
+        return max(map(lambda d: d.rect[2],self.domains))
+
+
     def get_pos(self):
         self.screen = self.player.game.screen
-        x =  0 - (self.cardheight - DOMAINPANELWIDTH)
+        x =  0 - (self.cardheight - DOMAINWIDTH)
         if self.player.position == "Player 1":
             y = self.screen.height - self.cardwidth
         elif self.player.position == "Player 2":

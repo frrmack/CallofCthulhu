@@ -1,13 +1,15 @@
 import random as rnd
+import pygame
 from util import *
 from cardheap import CardHeap, Deck, Hand, DiscardPile
 from domain import DomainPanel
-
+from layout import *
 
 class Board:
     # A player's board
     # (not the whole game board)
-    def __init__(self):
+    def __init__(self, player=None):
+        self.player=player
         self.characters = CardHeap()
         self.supports = CardHeap()
 
@@ -35,11 +37,62 @@ class Board:
             msg = "Only characters and certain support cards\n" +\
                   "can be played on a board"
             raise RuleError(msg)
+        if graphicsOn(self.player):
+            self.redraw()
+
 
     #-- Graphics
-    def get_pos(self):
-        pass
+    def get_rect(self):
+        self.screen = self.player.game.screen
+        x = self.player.domainPanel.get_width() + BOARDEDGEMARGIN
+        w = self.screen.width - RIGHTPANELWIDTH - x - BOARDEDGEMARGIN
+        if self.player.position == "Player 1":
+            y = self.screen.height//2 + CARDWIDTH//2 + STORYTOBOARDMARGIN
+            h = self.screen.height - y
+        elif self.player.position == "Player 2":
+            y = 0
+            h = self.screen.height//2 - CARDWIDTH//2 - STORYTOBOARDMARGIN
+        else:
+            raise GameError("Only available player positions are Player 1 and Player 2.")
+        self.pos = x,y
+        self.size = self.width, self.height = w,h
+        return pygame.Rect(x,y,w,h) 
 
+    def draw(self):
+        x,y,width,height = self.get_rect()
+        if self.player.position == "Player 1":
+            cardY = y + toInt(height*CARDPOSITIONRATIOONBOARD) 
+        elif self.player.position == "Player 2":
+            cardY = height - toInt(height*CARDPOSITIONRATIOONBOARD) - CARDHEIGHT
+        else:
+            raise GameError("Only available player positions are Player 1 and Player 2.")
+        nCards = len(self.cards())
+        nSpaces = nCards + 1
+        spaceWidth = toInt( (width - nCards*CARDWIDTH) / nSpaces)
+        if spaceWidth < 0:
+            try:
+                spaceWidth = toInt( (width - nCards*CARDWIDTH) / (nSpaces-2))
+            except ZeroDivisionError:
+                raise GameError("Screen is too small for even 2 cards on the board")
+        else:
+            x += spaceWidth
+        for i in range(nCards):
+            cardX = x + (CARDWIDTH + spaceWidth)*i
+            pos = (cardX, cardY)
+            self.cards()[i].image.draw(pos)
+
+    def clear(self):
+        rect = self.get_rect()
+        self.screen.blit(self.screen.background.subsurface(rect),rect)
+        for card in self.cards():
+            if card in self.screen.drawnImages:
+                self.screen.drawnImages.remove(card.image)
+
+
+
+    def redraw(self):
+        self.clear()
+        self.draw()
 
 
 class Player:
@@ -47,7 +100,7 @@ class Player:
         self.name = name
         self.game = None
         self.deck = Deck("%s's Deck" % self.name)
-        self.board = Board()
+        self.board = Board(self)
         self.domainPanel = DomainPanel(self)
         self.domains = self.domainPanel.domains
         self.discardPile = DiscardPile(self)
