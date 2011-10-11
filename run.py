@@ -29,11 +29,11 @@ print 'SEED:', SEED
 
 
 resolutions = ((1024,600),   #0 Eee-PC Netbook
-               (1024,800),   #1 LowRes
+               (1280,800),   #1 LowRes (WideScreen)
                (1280,1024),  #2 Standard 5:4 Display
                (1268,970),   #3 Window filling a standard 1280x1024 Display
                (1440,900),   #4 Macbook Pro 15" (WideScreen)
-               (1920,1200))  #5 Standard 16:10 HD Display, Macbook Pro 17" (WideScreen)
+               (1920,1200))  #5 Standard WideScreen HD Display, Macbook Pro 17"
 
 enableFullscreen  = (False, #0
                      True)  #1
@@ -159,7 +159,7 @@ try:
 
     # PLAY FOR A LIMITED NUMBER OF TURNS (for now, coding and debugging)
 
-    for turn in range(10):
+    for turn in range(20):
         printTurnHeader("__________ START %s's TURN ___________\n" % ActivePlayer.name)
 
 
@@ -244,10 +244,48 @@ try:
             ActivePlayer.play(card, domain)
             screen.readClick()
 
+
+        # Report
+        print game.report(), '\n'
+        print ActivePlayer.report(), '\n'
+
+
+
+        # STORY PHASE
+        printPhaseHeader('--- STORY PHASE ----------------------------------\n')
+        clear(4)
+
+        # STORY PHASE I
+        # Active Player commits characters to stories
+        printPhaseHeader('________ Active Player Commits ________\n')
+
+        if turn == 0:
+            print "NO COMMITS ON THE FIRST TURN\n"
+        else:
+
+            while True:
+                # keep committing until you choose no character to commit
+
+                character, story = getDecision.commitCharacterToStoryWhenActive(ActivePlayer)
+
+                if character is None:
+                    break
+
+                print ActivePlayer.name,'COMMITS',character,'\n\t TO',story,'\n'
+                ############!!!!!!!!!!!!!!!!!!!!!!!#######################
+                ############!!!!!!!!!!!!!!!!!!!!!!!#######################
+                ActivePlayer.commit(character, story)
+                ############!!!!!!!!!!!!!!!!!!!!!!!#######################
+                ############!!!!!!!!!!!!!!!!!!!!!!!#######################
+
+        # Report
+        print game.report(showCommitted=True), '\n'
+        print ActivePlayer.report(), '\n'
+
         
         
+        # End of turn, swap active player
         ActivePlayer, DefendingPlayer = DefendingPlayer, ActivePlayer
-        screen.readClick()
 
         
 except:

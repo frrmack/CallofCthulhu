@@ -80,7 +80,7 @@ class Screen(object):
             for event in pygame.event.get():
 
                 # window closed
-                if event.type == pygame.QUIT:
+                if event.type in (pygame.QUIT, pygame.KEYDOWN):
                     sys.exit()
 
                 # click

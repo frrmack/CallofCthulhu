@@ -59,7 +59,7 @@ class Board:
         return pygame.Rect(x,y,w,h) 
 
     def draw(self):
-        x,y,width,height = self.get_rect()
+        x,y,width,height = self.rect = self.get_rect()
         if self.player.position == "Player 1":
             cardY = y + toInt(height*CARDPOSITIONRATIOONBOARD) 
         elif self.player.position == "Player 2":
@@ -82,7 +82,10 @@ class Board:
             self.cards()[i].image.draw(pos)
 
     def clear(self):
-        rect = self.get_rect()
+        try:
+            rect = self.rect
+        except AttributeError:
+            rect = self.get_rect()
         self.screen.blit(self.screen.background.subsurface(rect),rect)
         for card in self.cards():
             if card in self.screen.drawnImages:
@@ -175,6 +178,7 @@ class Player:
             self.board.characters.remove(card)
             card.exhaust()
             story.committed[self].append(card)
+
 
     def draw(self, n=1):
         for i in range(n):

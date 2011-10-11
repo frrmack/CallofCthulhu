@@ -3,7 +3,7 @@ import numpy.random
 poisson = numpy.random.poisson
 
 from util import *
-from layout import CARDBACKIMAGE
+from layout import *
 from graphics import CardImage
 
 
@@ -61,9 +61,13 @@ class Card:
         else:
             self.state = 'exhausted'
         if graphicsOn(self.owner):
+            x,y = self.image.pos
+            x -= toInt( (CARDHEIGHT - CARDWIDTH)/2. )
+            y += toInt( (CARDHEIGHT - CARDWIDTH)/2. )
+            pos = x,y
             self.image.clear()
             self.image.turnRight()
-            self.image.draw(self.pos)
+            self.image.draw(pos)
             self.owner.screen.update()
 
 
@@ -73,9 +77,13 @@ class Card:
         else:
             self.state = 'ready'
         if graphicsOn(self.owner):
+            x,y = self.image.pos
+            x += toInt( (CARDHEIGHT - CARDWIDTH)/2. )
+            y -= toInt( (CARDHEIGHT - CARDWIDTH)/2. )
+            pos = x,y
             self.image.clear()
             self.image.turnLeft()
-            self.image.draw(self.pos)
+            self.image.draw(pos)
             self.owner.screen.update()
             
 
@@ -157,6 +165,16 @@ class Character(Card):
             raise RuleError("This character is already insane.")
         else:
             self.state = 'insane'
+            if graphicsOn(self.owner):
+                x,y = self.image.pos
+                x -= toInt( (CARDHEIGHT - CARDWIDTH)/2. )
+                y += toInt( (CARDHEIGHT - CARDWIDTH)/2. )
+                pos = x,y
+                self.image.clear()
+                self.image.turnRight()
+                self.image.flipCard()
+                self.draw(pos)
+                self.owner.screen.update()
 
     def restore(self):
         if not self.isInsane():
@@ -164,9 +182,10 @@ class Character(Card):
         else:
             self.state = 'exhausted'
         if graphicsOn(self.owner):
+            pos = self.image.pos
             self.image.clear()
             self.image.flipCard()
-            self.draw(self.pos)
+            self.draw(pos)
             self.owner.screen.update()
 
 
