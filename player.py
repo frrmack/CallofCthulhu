@@ -178,6 +178,10 @@ class Player:
             self.board.characters.remove(card)
             card.exhaust()
             story.committed[self].append(card)
+            if graphicsOn(self):
+                self.board.redraw()
+                
+
 
 
     def draw(self, n=1):

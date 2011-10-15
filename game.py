@@ -77,7 +77,7 @@ class Game:
         for i in range(3):
             pos = (x + i*(step), y)
             self.stories[i].image.draw(pos)
-            
+
 
 
 

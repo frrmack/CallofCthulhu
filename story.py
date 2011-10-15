@@ -213,6 +213,7 @@ class Story(Card):
             raise RuleError("This is not a valid story slot")
         game.stories[storyslot] = self
         self.game = game
+        self.slot = storyslot
         self.Player1 = game.Player1
         self.Player2 = game.Player2
         self.committed[self.Player1] = []
@@ -242,3 +243,23 @@ class Story(Card):
             for card in committed[:]:
                 committed.remove(card)
                 player.board.add(card)
+
+
+    #-- Graphics
+    def drawCommitted(self, position):
+        for player, committed in self.committed.items():
+            x,y = self.image.pos
+            x += (self.slot-1) * COMMITTEDXSHIFT
+            self.P1CommittedX
+            if player.position == position
+                y += sum(map(lambda c: c.image.height, committed))
+                self.P1CommittedY = y
+                for i in range(len(committed)-1,-1,-1):
+                    card = committed[i]
+                    y -= card.image.height
+                    pos = x,y
+                    card.image.draw(pos)
+            self.rect
+            
+
+
