@@ -1,7 +1,9 @@
 from util import *
+from layout import *
 from card import Card
 from graphics import StoryImage
 import getDecision
+from pygame import Rect
 
 class Struggle:
     def __init__(self, name):
@@ -125,6 +127,7 @@ class Story(Card):
             self.image = StoryImage(imageFileName)
         self.committed = {}
         self.success = {}
+        self.rect = {}
         self.game = None
         self.Player1 = None
         self.Player2 = None
@@ -220,8 +223,13 @@ class Story(Card):
         self.committed[self.Player2] = []
         self.success[self.Player1] = 0
         self.success[self.Player2] = 0
+        self.rect[self.Player1] = Rect(0,0,0,0)
+        self.rect[self.Player2] = Rect(0,0,0,0)
         if hasattr(self, 'image') and self.image != None:
             self.image.addToScreen(self.game.screen)
+        if graphicsOn(self.game):
+            screen = self.game.screen
+            self.committedWindow = screen.height//2 - CARDWIDTH//2 - DISCARDPANELHEIGHT - CARDHEIGHT - 3
 
     def resolve(self):
         for struggle in self.struggles:
@@ -241,25 +249,57 @@ class Story(Card):
     def uncommitAll(self):
         for player, committed in self.committed.items():
             for card in committed[:]:
+                if graphicsOn(player) and player.position == "Player 2":
+                    card.image.turn180()
                 committed.remove(card)
                 player.board.add(card)
-
+            if graphicsOn(player):
+                self.redrawCommitted(player)
+                player.board.redraw()
 
     #-- Graphics
-    def drawCommitted(self, position):
-        for player, committed in self.committed.items():
-            x,y = self.image.pos
-            x += (self.slot-1) * COMMITTEDXSHIFT
-            self.P1CommittedX
-            if player.position == position
-                y += sum(map(lambda c: c.image.height, committed))
-                self.P1CommittedY = y
-                for i in range(len(committed)-1,-1,-1):
-                    card = committed[i]
-                    y -= card.image.height
-                    pos = x,y
-                    card.image.draw(pos)
-            self.rect
+    def drawCommitted(self, player):
+        position = player.position
+        committed = self.committed[player]
+        x,y = self.image.pos
+        x += (self.slot-1) * COMMITTEDXSHIFT
+        X = min((x, self.image.pos[0]))
+        step = 0
+        if len(committed) > 1:
+            step = toInt((self.committedWindow-7) / (len(committed)-1.))
+        step = min((step,COMMITTEDSTEP))
+        if position == "Player 1":
+            y += CARDWIDTH
+            i = 0
+            for i in range(len(committed)):
+                card = committed[i]
+                pos = (x,y+step*i)
+                card.image.draw(pos)
+            Y = self.image.pos[1] + CARDWIDTH
+        elif position == "Player 2":
+            y -= CARDWIDTH
+            i = 0
+            for i in range(len(committed)):
+                card = committed[i]
+                pos = (x,y-step*i)
+                card.image.draw(pos)
+            Y = self.image.pos[1] - self.committedWindow
+        self.rect[player] = Rect(X,Y,CARDHEIGHT+COMMITTEDXSHIFT, self.committedWindow)
+
+    def clearCommitted(self, player):
+        screen = player.game.screen
+        screen.blit(screen.background.subsurface(self.rect[player]),self.rect[player])
+        for card in self.committed[player]:
+            if card in screen.drawnImages:
+                screen.drawnImages.remove(card.image)
+
+        
+    def redrawCommitted(self, player):
+        self.clearCommitted(player)
+        self.drawCommitted(player)
+
+
+
+
+
             
-
-

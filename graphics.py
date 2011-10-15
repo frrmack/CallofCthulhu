@@ -196,11 +196,17 @@ class CardImage(Image):
         self.width, self.height = self.size = self.surface.get_size()
         return self
 
+    def turn180(self):
+        self.turnLeft()
+        self.turnLeft()
+
+
 class StoryImage(CardImage):
     regularSize = (CARDHEIGHT,CARDWIDTH)
     zoomSize = (ZOOMEDCARDHEIGHT,ZOOMEDCARDWIDTH)
     
     
+
 class DomainImage(CardImage):
     def __init__(self, screen=None):
         CardImage.__init__(self, CARDBACKIMAGE, screen)

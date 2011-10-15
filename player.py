@@ -44,14 +44,14 @@ class Board:
     #-- Graphics
     def get_rect(self):
         self.screen = self.player.game.screen
-        x = self.player.domainPanel.get_width() + BOARDEDGEMARGIN
-        w = self.screen.width - RIGHTPANELWIDTH - x - BOARDEDGEMARGIN
+        x = self.player.domainPanel.get_width() 
+        w = self.screen.width - RIGHTPANELWIDTH - x 
         if self.player.position == "Player 1":
-            y = self.screen.height//2 + CARDWIDTH//2 + STORYTOBOARDMARGIN
-            h = self.screen.height - y
+            y = self.screen.height - DISCARDPANELHEIGHT - CARDHEIGHT - 3
+            h = CARDHEIGHT
         elif self.player.position == "Player 2":
-            y = 0
-            h = self.screen.height//2 - CARDWIDTH//2 - STORYTOBOARDMARGIN
+            y = DISCARDPANELHEIGHT + 3
+            h = CARDHEIGHT
         else:
             raise GameError("Only available player positions are Player 1 and Player 2.")
         self.pos = x,y
@@ -60,12 +60,9 @@ class Board:
 
     def draw(self):
         x,y,width,height = self.rect = self.get_rect()
-        if self.player.position == "Player 1":
-            cardY = y + toInt(height*CARDPOSITIONRATIOONBOARD) 
-        elif self.player.position == "Player 2":
-            cardY = height - toInt(height*CARDPOSITIONRATIOONBOARD) - CARDHEIGHT
-        else:
-            raise GameError("Only available player positions are Player 1 and Player 2.")
+        x += BOARDEDGEMARGIN
+        width -= BOARDEDGEMARGIN
+        cardY = y
         nCards = len(self.cards())
         nSpaces = nCards + 1
         spaceWidth = toInt( (width - nCards*CARDWIDTH) / nSpaces)
@@ -77,15 +74,16 @@ class Board:
         else:
             x += spaceWidth
         for i in range(nCards):
+            card = self.cards()[i]
             cardX = x + (CARDWIDTH + spaceWidth)*i
-            pos = (cardX, cardY)
-            self.cards()[i].image.draw(pos)
+            if card.isExhausted():
+                pos = (cardX, cardY+toInt((CARDHEIGHT - CARDWIDTH)/2.))
+            else:
+                pos = (cardX, cardY)
+            card.image.draw(pos)
 
     def clear(self):
-        try:
-            rect = self.rect
-        except AttributeError:
-            rect = self.get_rect()
+        rect = self.get_rect()
         self.screen.blit(self.screen.background.subsurface(rect),rect)
         for card in self.cards():
             if card in self.screen.drawnImages:
@@ -180,7 +178,9 @@ class Player:
             story.committed[self].append(card)
             if graphicsOn(self):
                 self.board.redraw()
-                
+                if self.position == "Player 2":
+                    card.image.turn180()
+                story.redrawCommitted(self)
 
 
 

@@ -28,12 +28,13 @@ print 'SEED:', SEED
 
 
 
-resolutions = ((1024,600),   #0 Eee-PC Netbook
-               (1280,800),   #1 LowRes (WideScreen)
-               (1280,1024),  #2 Standard 5:4 Display
-               (1268,970),   #3 Window filling a standard 1280x1024 Display
-               (1440,900),   #4 Macbook Pro 15" (WideScreen)
-               (1920,1200))  #5 Standard WideScreen HD Display, Macbook Pro 17"
+resolutions = ((750,520),    #0 Eee-PC Netbook Window
+               (1024,600),   #1 Eee-PC Netbook Fullscreen
+               (1280,800),   #2 LowRes (WideScreen)
+               (1280,1024),  #3 Standard 5:4 Display
+               (1268,970),   #4 Window filling a standard 1280x1024 Display
+               (1440,900),   #5 Macbook Pro 15" (WideScreen)
+               (1920,1200))  #6 Standard WideScreen HD Display, Macbook Pro 17"
 
 enableFullscreen  = (False, #0
                      True)  #1
@@ -56,7 +57,7 @@ backgrounds = ("cthulhu_1440x900.jpg",               #0
 ###############################
 ##### CHOOSE DISPLAY MODE #####
 
-resolution = 3    # 3  4  5
+resolution = 0    # 4  5  6
 fullscreen = 0    # 0  0  1
 background = 6    # 7  0  0
 
@@ -185,6 +186,8 @@ try:
                 card.restore()
 
 
+        ActivePlayer.board.redraw()
+
         screen.readClick()
         print
 
@@ -199,7 +202,7 @@ try:
             nCards, grammar = 2, 'cards'
         ActivePlayer.draw(nCards)
         print ActivePlayer.name, 'draws %i %s' % (nCards,grammar),'\n'
-        print ActivePlayer.handReport(), '\n'
+        # print ActivePlayer.handReport(), '\n'
 
 
         screen.readClick()
@@ -218,7 +221,7 @@ try:
         ActivePlayer.attach2Domain(card, domain)
 
         # Report
-        print ActivePlayer.domainReport(), '\n'
+        # print ActivePlayer.domainReport(), '\n'
 
         # ACTIONS
 
@@ -246,8 +249,8 @@ try:
 
 
         # Report
-        print game.report(), '\n'
-        print ActivePlayer.report(), '\n'
+        # print game.report(), '\n'
+        # print ActivePlayer.report(), '\n'
 
 
 
@@ -272,15 +275,68 @@ try:
                     break
 
                 print ActivePlayer.name,'COMMITS',character,'\n\t TO',story,'\n'
-                ############!!!!!!!!!!!!!!!!!!!!!!!#######################
-                ############!!!!!!!!!!!!!!!!!!!!!!!#######################
                 ActivePlayer.commit(character, story)
-                ############!!!!!!!!!!!!!!!!!!!!!!!#######################
-                ############!!!!!!!!!!!!!!!!!!!!!!!#######################
+
+        # Report
+        # print game.report(showCommitted=True), '\n'
+        # print ActivePlayer.report(), '\n'
+
+        screen.readClick()
+
+
+        # ACTIONS
+
+        # STORY PHASE II
+        # Defending Player commits characters to stories
+        printPhaseHeader('________ Defending Player Commits ________\n')
+
+        while True:
+            # keep committing until you choose no character to commit
+
+            character, story = getDecision.commitCharacterToStoryWhenDefending(DefendingPlayer)
+
+            if character is None:
+                break
+
+            print DefendingPlayer.name,'COMMITS',character,'\n\t TO',story,'\n'
+            DefendingPlayer.commit(character, story)
+
 
         # Report
         print game.report(showCommitted=True), '\n'
         print ActivePlayer.report(), '\n'
+
+        screen.readClick()
+
+
+        # ACTIONS
+
+        # STORY PHASE III
+        # Resolve stories
+        printPhaseHeader('________ Stories are Resolved ________\n')
+
+        activeStories = filter(lambda st: st.isAnyCommitted(), game.stories)
+        if len(activeStories) == 0:
+            print 'NO STORIES TO RESOLVE\n'
+            clear(15)
+        else:
+            for story in activeStories:
+                # print story.report()
+                story.resolve()
+
+        # Response to struggles / success
+
+        # Uncommit characters
+        for story in activeStories:
+            story.uncommitAll()
+
+
+        screen.readClick()
+
+        # ACTIONS
+
+        # END OF TURN
+
 
         
         
