@@ -38,6 +38,7 @@ class Hand(CardHeap):
             card.image.hide()
         if graphicsOn(self.player):
             self.screen = self.player.screen
+            card.image.surface = scale(card.image.surface, size=(HANDCARDWIDTH, HANDCARDHEIGHT))
             self.redraw()
 
 
@@ -49,6 +50,7 @@ class Hand(CardHeap):
             self.screen = self.player.screen
             if card.image in self.screen.drawnImages:
                 self.screen.drawnImages.remove(card.image)
+            card.image.surface = scale(card.image.surface, size=(CARDWIDTH, CARDHEIGHT))
             self.redraw()
 
     def belongToPlayer(self, player):
@@ -58,9 +60,9 @@ class Hand(CardHeap):
 
     def get_pos(self):
         self.screen = self.player.game.screen
-        x = self.screen.width - CARDWIDTH
+        x = self.screen.width - HANDCARDWIDTH
         if self.player.position == "Player 1":
-            y = self.screen.height - CARDHEIGHT
+            y = self.screen.height - HANDCARDHEIGHT
         elif self.player.position == "Player 2":
             y = 0
         else:
@@ -73,9 +75,9 @@ class Hand(CardHeap):
         if len(self) == 1:
             step = 0
         else:
-            step = toInt( (HANDMAXWIDTH-CARDWIDTH) / (len(self)-1.) )
+            step = toInt( (HANDMAXWIDTH-HANDCARDWIDTH) / (len(self)-1.) )
             step = trunc(step, top=MAXHANDSTEP)
-        self.rect = pygame.Rect(x-(len(self)-1)*step,y,CARDWIDTH+(len(self)-1)*step,CARDHEIGHT)
+        self.rect = pygame.Rect(x-(len(self)-1)*step,y,HANDCARDWIDTH+(len(self)-1)*step,HANDCARDHEIGHT)
 
         if self.player.position == "Player 1":  #show cards
             for i in range(len(self)-1,-1,-1):
