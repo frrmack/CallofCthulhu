@@ -54,7 +54,6 @@ class Hand(CardHeap):
     def belongToPlayer(self, player):
         self.player = player
         self.screen = self.player.game.screen
-        self.createHiddenCards()
 
 
     def get_pos(self):
@@ -114,6 +113,7 @@ class DiscardPile(CardHeap):
         if graphicsOn(self.player):
             self.screen = self.player.screen
             card.image.surface = scale(card.image.surface, size=(DISCARDWIDTH, DISCARDHEIGHT))
+            card.image.turnLeft()
             self.redraw()
 
 
@@ -124,37 +124,41 @@ class DiscardPile(CardHeap):
             if card.image in self.screen.drawnImages:
                 self.screen.drawnImages.remove(card.image)
             card.image.surface = scale(card.image.surface, size=(CARDWIDTH, CARDHEIGHT))
+            card.image.turnLeft()
             self.redraw()
 
-    def get_pos(self):
+    def get_rect(self):
         self.screen = self.player.game.screen
-        x = self.screen.width - DISCARDPOSFROMRIGHT
+        x = self.player.domainPanel.get_width() 
+        x = trunc(x, bottom= DOMAINWIDTH + 8*RESOURCEBAR)
         if self.player.position == "Player 1":
-            y = self.screen.height - DISCARDHEIGHT - 3
+            y = self.screen.height - DISCARDPANELHEIGHT
         elif self.player.position == "Player 2":
-            y = 3
+            y = 0
         else:
             raise GameError("Only available player positions are Player 1 and Player 2.")
-        return (x,y)
-    
+        self.pos = (x,y)
+        self.width = w = self.screen.width - RIGHTPANELWIDTH - 5*SMALLMARGIN - x
+        self.height = h = DISCARDPANELHEIGHT
+        self.rect = pygame.Rect(x,y,w,h)
+        return self.rect
 
     def draw(self):
         self.screen = self.player.game.screen
-        x,y = self.pos = self.get_pos()
-        step = DISCARDSTEP
-        if len(self) > 0:
-            self.rect = self[0].image.rect
+        x,y,w,h = self.get_rect()
+        x = x + w - DISCARDHEIGHT
+        if len(self) > 1:
+            step = (w-DISCARDHEIGHT)//(len(self)-1)
+            step = min(step, DISCARDSTEP)
         else:
-            self.rect = Rect(0,0,0,0)
+            step = DISCARDSTEP
         if self.player.position == "Player 1":
-            self.rect[3] -= step*(len(self)-1)
             for i in range(len(self)):
-                pos = (x, y - step*i)
+                pos = (x - step*i, y)
                 self[i].image.draw(pos)
         elif self.player.position == "Player 2":
-            self.rect[3] += step*(len(self)-1)
             for i in range(len(self)):
-                pos = (x, y + step*i)
+                pos = (x - step*i, y)
                 self[i].image.draw(pos)
         else:
             raise GameError("Only available player positions are Player 1 and Player 2.")

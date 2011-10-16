@@ -47,10 +47,10 @@ class Board:
         x = self.player.domainPanel.get_width() 
         w = self.screen.width - RIGHTPANELWIDTH - x 
         if self.player.position == "Player 1":
-            y = self.screen.height - DISCARDPANELHEIGHT - CARDHEIGHT - 3
+            y = self.screen.height - DISCARDPANELHEIGHT - CARDHEIGHT - 5*SMALLMARGIN
             h = CARDHEIGHT
         elif self.player.position == "Player 2":
-            y = DISCARDPANELHEIGHT + 3
+            y = DISCARDPANELHEIGHT + 5*SMALLMARGIN
             h = CARDHEIGHT
         else:
             raise GameError("Only available player positions are Player 1 and Player 2.")

@@ -229,7 +229,7 @@ class Story(Card):
             self.image.addToScreen(self.game.screen)
         if graphicsOn(self.game):
             screen = self.game.screen
-            self.committedWindow = screen.height//2 - CARDWIDTH//2 - DISCARDPANELHEIGHT - CARDHEIGHT - 3
+            self.committedWindow = screen.height//2 - CARDWIDTH//2 - DISCARDPANELHEIGHT - CARDHEIGHT - 5*SMALLMARGIN
 
     def resolve(self):
         for struggle in self.struggles:
@@ -266,7 +266,7 @@ class Story(Card):
         X = min((x, self.image.pos[0]))
         step = 0
         if len(committed) > 1:
-            step = toInt((self.committedWindow-7) / (len(committed)-1.))
+            step = toInt(self.committedWindow / (len(committed)-1.))
         step = min((step,COMMITTEDSTEP))
         if position == "Player 1":
             y += CARDWIDTH
