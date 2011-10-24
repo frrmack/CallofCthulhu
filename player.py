@@ -184,14 +184,14 @@ class Player:
             raise RuleError("This character is exhausted. It cannot commit to a story.")
         else:
             self.board.characters.remove(card)
-            card.exhaust()
+            card.exhaust(draw=False)
             story.committed[self].append(card)
             if graphicsOn(self):
-                self.board.redraw()
                 if self.position == "Player 1":
                     for attachment in card.attached:
                         attachment.image.turn180()
                     card.image.turn180()
+                self.board.redraw()
                 story.redrawCommitted(self)
 
 

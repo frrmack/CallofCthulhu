@@ -63,7 +63,7 @@ class Card:
         return self.isInState('ready')
 
     #-- Actions
-    def exhaust(self):
+    def exhaust(self, draw=True):
         if not self.isReady():
             raise RuleError("You can only exhaust a ready character")
         else:
@@ -78,11 +78,12 @@ class Card:
             for card in self.attached:
                 card.image.clear()
                 card.image.turnLeft()
-            self.draw(pos)
-            self.owner.screen.update()
+            if draw:
+                self.draw(pos)
+                self.owner.screen.update()
 
 
-    def ready(self):
+    def ready(self, draw=True):
         if not self.isExhausted():
             raise RuleError("You can only ready an exhausted character")
         else:
@@ -97,8 +98,9 @@ class Card:
             for card in self.attached:
                 card.image.clear()
                 card.image.turnRight()
-            self.image.draw(pos)
-            self.owner.screen.update()
+            if draw:
+                self.image.draw(pos)
+                self.owner.screen.update()
             
     def attach(self, card):
         self.attached.append(card)
@@ -196,7 +198,7 @@ class Character(Card):
         return self.isInState('insane')
 
     #-- Actions
-    def goInsane(self):
+    def goInsane(self, draw=True):
         if self.isInsane():
             raise RuleError("This character is already insane.")
         else:
@@ -216,10 +218,11 @@ class Character(Card):
                 self.image.flipCard()
                 for card in self.attached:
                     card.image.flipCard()
-                self.draw(pos)
-                self.owner.screen.update()
+                if draw:
+                    self.draw(pos)
+                    self.owner.screen.update()
 
-    def restore(self):
+    def restore(self, draw=True):
         if not self.isInsane():
             raise RuleError("You can only restore insane characters")
         else:
@@ -231,8 +234,9 @@ class Character(Card):
             for card in self.attached:
                 card.image.clear()
                 card.image.flipCard()
-            self.draw(pos)
-            self.owner.screen.update()
+            if draw:
+                self.draw(pos)
+                self.owner.screen.update()
 
 
 
