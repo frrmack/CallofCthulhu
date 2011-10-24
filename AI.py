@@ -51,17 +51,24 @@ class AI(Player):
 
         # Try each card one by one in order of cost
         for card in sorted(self.hand, key=lambda card: card.cost, reverse=True):
-            if card.cost == 0:
-                # No target choosing coded yet
+
+            if card.category == "support" and "Attachment" in card.subtypes:
+                if len(self.board.characters) > 0:
+                    target = rnd.choice(self.board.characters)
+                else:
+                    # An attachment without a valid target to play on
+                    #Skip to the next card
+                    continue
+            else:
                 target = None
+
+            if card.cost == 0:
                 # No cost: Play it without draining
                 domain = None
                 # Choice made
                 return card, target, domain
 
             elif playableCosts != [] and card.cost <= max(playableCosts):
-                # No target choosing coded yet:
-                target = None
                 # Choose the domain with closest totalRes to pay for it
                 availableDomains = filter(lambda dom: card.cost <= dom.totalRes(), freshDomains)
                 inefficiency = map(lambda dom: abs(dom.totalRes() - card.cost), availableDomains)
@@ -79,10 +86,17 @@ class AI(Player):
 
     def commitCharacterToStoryWhenActive(self):
         # Simple AI --- randomly commit everyone
+        #               (leave a couple to defend if opponent has characters)
         availableStories = self.game.stories
         availableCharacters = filter(lambda c: c.isReady(), self.board.characters)
+        opponentCharacters = self.opponent().board.characters
+        opponentDefenders = filter(lambda c: c.isReady(), opponentCharacters)
 
-        if len(availableCharacters) == 0 or len(availableStories) == 0:
+        if len(availableStories) == 0:
+            character, story = None, None
+        elif  len(availableCharacters) < 2 and len(opponentCharacters) > 2:
+            character, story = None, None
+        elif len(availableCharacters) == 0:
             character, story = None, None
         else:
             character = availableCharacters[0]

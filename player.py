@@ -31,11 +31,10 @@ class Board:
     def add(self, card):
         if card.category == 'character':
             self.characters.append(card)
-        elif card.category == 'boardSupport':
+        elif card.category == 'support':
             self.supports.append(card)
         else:
-            msg = "Only characters and certain support cards\n" +\
-                  "can be played on a board"
+            msg = "Only characters and certain support cards can be played on a board"
             raise RuleError(msg)
         if graphicsOn(self.player):
             self.redraw()
@@ -47,11 +46,11 @@ class Board:
         x = self.player.domainPanel.get_width() 
         w = self.screen.width - RIGHTPANELWIDTH - x 
         if self.player.position == "Player 1":
-            y = self.screen.height - DISCARDPANELHEIGHT - CARDHEIGHT - 5*SMALLMARGIN
-            h = CARDHEIGHT
+            y = self.screen.height - DISCARDPANELHEIGHT - CARDHEIGHT - 2* RESOURCEBAR - 5*SMALLMARGIN
+            h = CARDHEIGHT + 2*RESOURCEBAR
         elif self.player.position == "Player 2":
             y = DISCARDPANELHEIGHT + 5*SMALLMARGIN
-            h = CARDHEIGHT
+            h = CARDHEIGHT + 2*RESOURCEBAR
         else:
             raise GameError("Only available player positions are Player 1 and Player 2.")
         self.pos = x,y
@@ -62,7 +61,7 @@ class Board:
         x,y,width,height = self.rect = self.get_rect()
         x += BOARDEDGEMARGIN
         width -= BOARDEDGEMARGIN
-        cardY = y
+        cardY = y + 2*RESOURCEBAR
         nCards = len(self.cards())
         nSpaces = nCards + 1
         spaceWidth = toInt( (width - nCards*CARDWIDTH) / nSpaces)
@@ -80,19 +79,30 @@ class Board:
                 pos = (cardX, cardY+toInt((CARDHEIGHT - CARDWIDTH)/2.))
             else:
                 pos = (cardX, cardY)
-            card.image.draw(pos)
+            card.draw(pos)
 
     def clear(self):
         rect = self.get_rect()
+        if self.player.position == "Player 1":
+            x,y,w,h = rect
+            rect = x,self.screen.height//2+CARDWIDTH//2,w,self.screen.height//2-CARDWIDTH//2-DISCARDPANELHEIGHT-5*SMALLMARGIN
+        elif self.player.position == "Player 2":
+            x,y,w,h = rect
+            rect = x,0,w,h+DISCARDPANELHEIGHT+5*SMALLMARGIN
         self.screen.blit(self.screen.background.subsurface(rect),rect)
         for card in self.cards():
             if card in self.screen.drawnImages:
                 self.screen.drawnImages.remove(card.image)
-
+        if self.player.position == "Player 1":
+            for story in self.player.game.stories:
+                story.redrawCommitted(self.player)
+        elif self.player.position == "Player 2":
+            self.player.discardPile.redraw()
 
 
     def redraw(self):
         self.clear()
+        self.player.discardPile.redraw()  # TO HANDLE MANY ATTACHMENTS
         self.draw()
 
 
@@ -179,6 +189,8 @@ class Player:
             if graphicsOn(self):
                 self.board.redraw()
                 if self.position == "Player 2":
+                    for attachment in card.attached:
+                        attachment.image.turn180()
                     card.image.turn180()
                 story.redrawCommitted(self)
 
@@ -206,20 +218,42 @@ class Player:
         else:
             domain.drain()
         
-    def play(self, card, domain):
+    def play(self, card, target, domain):
         if card not in self.hand:
             raise RuleError("This card is not in your hand")
         elif card.cost == 0 and domain is not None:
             raise RuleError("Cannot drain a domain for 0 cost")
         else:
+
+            # play from hand
             self.payCost(card, domain)
             self.hand.remove(card)
-            if card.category in ['character', 'boardSupport']:
-                self.board.add(card)
-            elif card.category == 'event':
-                self.discardPile.add(card)
-            else:
-                raise RuleError("Don't know how to play category %s" % card.category)
+
+            # Effect of the card, where does it end up?
+            # Playing without a target
+            if target is None:
+                # Characters and Board Supports go to on player's board
+                if card.category in ['character', 'support']:
+                    self.board.add(card)
+                # Events end up in the discard pile
+                elif card.category == 'event':
+                    self.discardPile.add(card)
+                # Anything else is Undefined
+                else:
+                    raise RuleError("Don't know how to play category %s" % card.category)
+
+            #Playing with a target
+            elif target is not None:
+                # Attachments are attached to the target
+                if card.category == 'support' and "Attachment" in card.subtypes:
+                    try:
+                        target.attach(card)
+                        self.board.redraw()
+                    except AttributeError:
+                        raise RuleError("You cannot attach to this target")
+                # Anything else is undefined
+                else:
+                    raise RuleError("Don't know how to play this card")
 
     def useDeck(self, deck):
         self.deck = deck

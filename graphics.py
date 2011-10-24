@@ -158,7 +158,7 @@ class CardImage(Image):
         self.bigBackSurface = scale(self.backSurface, size=self.zoomSize)
         self.backSurface = scale(self.backSurface, size=self.regularSize)
         self.hidden=False
-
+        self.turned180=False
         
                                 
     def drawZoomed(self, pos):
@@ -197,6 +197,10 @@ class CardImage(Image):
         return self
 
     def turn180(self):
+        if not self.turned180:
+            self.turned180 = True
+        else:
+            self.turned180 = False
         self.turnLeft()
         self.turnLeft()
 

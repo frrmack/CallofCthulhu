@@ -172,5 +172,6 @@ class DiscardPile(CardHeap):
         self.screen.blit(self.screen.background.subsurface(self.rect),self.rect)
 
     def redraw(self):
+        self.screen = self.player.game.screen
         self.clear()
         self.draw()

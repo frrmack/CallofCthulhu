@@ -229,7 +229,7 @@ class Story(Card):
             self.image.addToScreen(self.game.screen)
         if graphicsOn(self.game):
             screen = self.game.screen
-            self.committedWindow = screen.height//2 - CARDWIDTH//2 - DISCARDPANELHEIGHT - CARDHEIGHT - 5*SMALLMARGIN
+            self.committedWindow = screen.height//2 - CARDWIDTH//2 - DISCARDPANELHEIGHT - CARDHEIGHT - 2*RESOURCEBAR - 5*SMALLMARGIN
 
     def resolve(self):
         for struggle in self.struggles:
@@ -250,6 +250,8 @@ class Story(Card):
         for player, committed in self.committed.items():
             for card in committed[:]:
                 if graphicsOn(player) and player.position == "Player 2":
+                    for attachment in card.attached:
+                        attachment.image.turn180()
                     card.image.turn180()
                 committed.remove(card)
                 player.board.add(card)
@@ -262,7 +264,6 @@ class Story(Card):
         position = player.position
         committed = self.committed[player]
         x,y = self.image.pos
-        x += (self.slot-1) * COMMITTEDXSHIFT
         X = min((x, self.image.pos[0]))
         step = 0
         if len(committed) > 1:
@@ -274,17 +275,18 @@ class Story(Card):
             for i in range(len(committed)):
                 card = committed[i]
                 pos = (x,y+step*i)
-                card.image.draw(pos)
+                card.draw(pos)
             Y = self.image.pos[1] + CARDWIDTH
+            self.rect[player] = Rect(X,Y,CARDHEIGHT+self.spaceBetween, self.committedWindow)
         elif position == "Player 2":
             y -= CARDWIDTH
             i = 0
             for i in range(len(committed)):
                 card = committed[i]
                 pos = (x,y-step*i)
-                card.image.draw(pos)
+                card.draw(pos)
             Y = self.image.pos[1] - self.committedWindow
-        self.rect[player] = Rect(X,Y,CARDHEIGHT+COMMITTEDXSHIFT, self.committedWindow)
+            self.rect[player] = Rect(X-self.spaceBetween,Y,CARDHEIGHT+self.spaceBetween, self.committedWindow)
 
     def clearCommitted(self, player):
         screen = player.game.screen

@@ -14,7 +14,15 @@ class Card:
         self.controller = None
         self.type = None
         self.attached = []
+        self.struggles = []
+        self.subtypes = []
         self.keywords = []
+        self.set = None
+        self.number = None
+        self.actions = []
+        self.disrupts = []
+        self.responses = []
+        self.forcedResponses = []
         self.state = ['ready', 'exhausted'][0]
         # imageFiles can be given as a string or
         # a sequence of strings (filenames)
@@ -67,7 +75,10 @@ class Card:
             pos = x,y
             self.image.clear()
             self.image.turnRight()
-            self.image.draw(pos)
+            for card in self.attached:
+                card.image.clear()
+                card.image.turnRight()
+            self.draw(pos)
             self.owner.screen.update()
 
 
@@ -83,17 +94,42 @@ class Card:
             pos = x,y
             self.image.clear()
             self.image.turnLeft()
+            for card in self.attached:
+                card.image.clear()
+                card.image.turnLeft()
             self.image.draw(pos)
             self.owner.screen.update()
             
+    def attach(self, card):
+        self.attached.append(card)
 
+    def getAttachedTo(self, card):
+        card.attach(self)
 
+    #-- Graphics
     def setScreen(self, screen):
         self.screen = screen
         self.image.addToScreen(screen)
         return self
 
+    def draw(self, pos):
+        x,y = pos
+        N = len(self.attached)
+        for i in range(N-1,-1,-1):
+            if self.isReady():
+                apos = x,y-RESOURCEBAR*(i+1)
+            elif not self.image.turned180:
+                apos = x+RESOURCEBAR*(i+1), y
+            else:
+                apos = x-RESOURCEBAR*(i+1), y
+            self.attached[i].draw(apos)
+        self.image.draw(pos)
+
+
 class Character(Card):
+
+    category = 'character'
+
     def __init__(self, name, imageFileName=None,
                  cost=0, terror=0,
                  combat=0, arcane=0,
@@ -102,13 +138,13 @@ class Character(Card):
                  randomize = False,
                  *args, **kwargs):
         Card.__init__(self, name, imageFileName, *args, **kwargs)
-        self.category = 'character'
         self.state = ['ready','exhausted', 'insane'][0]
         self.printedTerror = self.terror = terror 
         self.printedCombat = self.combat = combat
         self.printedArcane = self.arcane = arcane
         self.printedInvestigation = self.investigation = investigation
         self.printedSkill = self.skill = skill
+        self.attached = []
         self.wounds = 0
         self.toughness = 0
         
@@ -173,6 +209,10 @@ class Character(Card):
                 self.image.clear()
                 self.image.turnRight()
                 self.image.flipCard()
+                for card in self.attached:
+                    card.image.clear()
+                    card.image.turnRight()
+                    card.image.flipCard()
                 self.draw(pos)
                 self.owner.screen.update()
 
@@ -185,17 +225,24 @@ class Character(Card):
             pos = self.image.pos
             self.image.clear()
             self.image.flipCard()
+            for card in self.attached:
+                card.image.clear()
+                card.image.flipCard()
             self.draw(pos)
             self.owner.screen.update()
 
 
 
+
+
 class Event(Card):
+
+    category = 'event'
+
     def __init__(self, name, imageFileName=None,
                  randomize = False,
                  *args, **kwargs):
         Card.__init__(self, name, imageFileName, *args, **kwargs)
-        self.category = 'event'
 
         if randomize:
             self.name = rnd.choice(['Atrocious', 'Arabic', 'Fantastic',
@@ -218,13 +265,13 @@ class Event(Card):
 
 
 class Support(Card):
+
+    category = 'support'
+        
     def __init__(self, name, imageFileName=None,
-                 category = 'boardSupport',
                  randomize = False,
                  *args, **kwargs):
         Card.__init__(self, name, imageFileName, *args, **kwargs)
-        self.category = ['boardSupport', 'attachment'][0]
-        self.category = category
 
         if randomize:
             self.name = rnd.choice(['Baboonish', 'Beastly', 'Cackling',

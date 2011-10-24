@@ -70,14 +70,15 @@ class Game:
         self.drawStoryCard(2)
 
     def drawStories(self):
-        storypanelwidth = self.screen.width - 3*CARDHEIGHT + 2*SPACEBETWEENSTORIES - ZOOMEDCARDHEIGHT - DOMAINWIDTH
-        x = DOMAINWIDTH + storypanelwidth//2
+        storypanelwidth = self.screen.width - ZOOMEDCARDHEIGHT - LEFTPANELWIDTH
+        space = (storypanelwidth - 3*CARDHEIGHT) // 4
+        x = LEFTPANELWIDTH + space
         y = self.screen.height//2 - CARDWIDTH//2
-        step = CARDHEIGHT + SPACEBETWEENSTORIES
+        step = CARDHEIGHT + space
         for i in range(3):
             pos = (x + i*(step), y)
             self.stories[i].image.draw(pos)
-
+            self.stories[i].spaceBetween = space
 
 
 
@@ -165,6 +166,7 @@ def parseCardFile(cardFileName):
         except:
             print fields["Forced Responses"]
             raise
+    
     # return
     return card
 

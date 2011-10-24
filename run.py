@@ -57,7 +57,7 @@ backgrounds = ("cthulhu_1440x900.jpg",               #0
 ###############################
 ##### CHOOSE DISPLAY MODE #####
 
-resolution = 0    # 4  5  6
+resolution = 4    # 4  5  6
 fullscreen = 0    # 0  0  1
 background = 6    # 7  0  0
 
@@ -244,7 +244,7 @@ try:
             else:
                 print ActivePlayer.name, 'PLAYS %s USING %s \n' % (card, domain)
 
-            ActivePlayer.play(card, domain)
+            ActivePlayer.play(card, target, domain)
             screen.readClick()
 
 
