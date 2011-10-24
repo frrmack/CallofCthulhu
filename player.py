@@ -188,7 +188,7 @@ class Player:
             story.committed[self].append(card)
             if graphicsOn(self):
                 self.board.redraw()
-                if self.position == "Player 2":
+                if self.position == "Player 1":
                     for attachment in card.attached:
                         attachment.image.turn180()
                     card.image.turn180()

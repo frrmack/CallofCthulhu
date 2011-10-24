@@ -74,10 +74,10 @@ class Card:
             y += toInt( (CARDHEIGHT - CARDWIDTH)/2. )
             pos = x,y
             self.image.clear()
-            self.image.turnRight()
+            self.image.turnLeft()
             for card in self.attached:
                 card.image.clear()
-                card.image.turnRight()
+                card.image.turnLeft()
             self.draw(pos)
             self.owner.screen.update()
 
@@ -93,10 +93,10 @@ class Card:
             y -= toInt( (CARDHEIGHT - CARDWIDTH)/2. )
             pos = x,y
             self.image.clear()
-            self.image.turnLeft()
+            self.image.turnRight()
             for card in self.attached:
                 card.image.clear()
-                card.image.turnLeft()
+                card.image.turnRight()
             self.image.draw(pos)
             self.owner.screen.update()
             
@@ -119,9 +119,9 @@ class Card:
             if self.isReady():
                 apos = x,y-RESOURCEBAR*(i+1)
             elif not self.image.turned180:
-                apos = x+RESOURCEBAR*(i+1), y
-            else:
                 apos = x-RESOURCEBAR*(i+1), y
+            else:
+                apos = x+RESOURCEBAR*(i+1), y
             self.attached[i].draw(apos)
         self.image.draw(pos)
 
@@ -207,11 +207,14 @@ class Character(Card):
                 y += toInt( (CARDHEIGHT - CARDWIDTH)/2. )
                 pos = x,y
                 self.image.clear()
-                self.image.turnRight()
-                self.image.flipCard()
                 for card in self.attached:
                     card.image.clear()
-                    card.image.turnRight()
+                if not self.isExhausted():
+                    self.image.turnLeft()
+                    for card in self.attached:
+                        card.image.turnRight()
+                self.image.flipCard()
+                for card in self.attached:
                     card.image.flipCard()
                 self.draw(pos)
                 self.owner.screen.update()

@@ -249,7 +249,7 @@ class Story(Card):
     def uncommitAll(self):
         for player, committed in self.committed.items():
             for card in committed[:]:
-                if graphicsOn(player) and player.position == "Player 2":
+                if graphicsOn(player) and player.position == "Player 1":
                     for attachment in card.attached:
                         attachment.image.turn180()
                     card.image.turn180()
