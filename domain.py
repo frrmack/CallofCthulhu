@@ -1,4 +1,5 @@
 from layout import *
+from pygame import Rect
 from graphics import DomainImage
 from util import *
 
@@ -85,8 +86,8 @@ class Domain(object):
         self.screen.blit(self.screen.background.subsurface(self.rect),self.rect)
         
     def redraw(self):
-        self.clear()
-        self.draw()
+        self.player.domainPanel.redraw()
+
     
 
 
@@ -96,8 +97,6 @@ class DomainPanel(object):
         self.domains = [Domain(player, 'Domain 1'),
                         Domain(player, 'Domain 2'),
                         Domain(player, 'Domain 3')]
-        self.cardwidth = CARDWIDTH
-        self.cardheight = CARDHEIGHT
 
     #-- Graphics
     def get_width(self):
@@ -106,13 +105,17 @@ class DomainPanel(object):
 
     def get_pos(self):
         self.screen = self.player.game.screen
-        x =  0 - (self.cardheight - DOMAINWIDTH)
+        x =  0 - (CARDHEIGHT - DOMAINWIDTH)
         if self.player.position == "Player 1":
-            y = self.screen.height - self.cardwidth
+            y = self.screen.height - CARDWIDTH
         elif self.player.position == "Player 2":
             y = 0
         else:
             raise RuleError("Only available player positions are Player 1 and Player 2.")
+        self.width = DOMAINWIDTH
+        self.height = 3*CARDWIDTH+2*SPACEBETWEENDOMAINS
+        self.rect = Rect(x,y,self.width,self.height)
+        self.pos = x,y
         return (x,y)
 
     def draw(self):
@@ -123,15 +126,38 @@ class DomainPanel(object):
                 domain.screen = self.player.game.screen
                 domain.image = DomainImage(domain.screen)
             if self.player.position == "Player 1":
-                pos = (x, y-i*(self.cardwidth+SPACEBETWEENDOMAINS))
+                pos = (x, y-i*(CARDWIDTH+SPACEBETWEENDOMAINS))
                 domain.pos = pos
             elif self.player.position == "Player 2":
-                pos = (x, y+i*(self.cardwidth+SPACEBETWEENDOMAINS))
+                pos = (x, y+i*(CARDWIDTH+SPACEBETWEENDOMAINS))
                 domain.pos = pos
             else:
                 raise RuleError("Only available player positions are Player 1 and Player 2.")
             domain.image.draw(pos)
             domain.rect = domain.screen.clipRectWithin(domain.image.rect)
+
+    def clear(self):
+        maxRes = max(map(lambda d: d.totalRes(), self.domains))
+        self.width = DOMAINWIDTH + maxRes*RESOURCEBAR
+        x = 0
+        if self.player.position == "Player 1":
+            y = self.screen.height - self.height
+        elif self.player.position == "Player 2":
+            y = 0
+        self.rect = Rect(x,y,self.width,self.height)
+        for domain in self.domains:
+            for card in domain.resources:
+                if card.image in domain.screen.drawnImages:
+                    domain.screen.drawnImages.remove(card.image)
+            if domain.image in domain.screen.drawnImages:
+                self.screen.drawnImages.remove(domain.image)
+        self.screen.blit(self.screen.background.subsurface(self.rect),self.rect)
+        
+
+    def redraw(self):
+        self.clear()
+        for domain in self.domains:
+            domain.draw()
 
 
 

@@ -47,7 +47,8 @@ def grayscaleCopy(surface):
     for x in range(width):
         for y in range(height):
             red, green, blue, alpha = surf.get_at((x, y))
-            L = 0.3 * red + 0.59 * green + 0.11 * blue
+            L = 0.3 * red + 0.59 * green + 0.11 * blue  # Standard conversion
+            L = toInt(L*0.5)  # MAKE IT DARKER!
             gs_color = (L, L, L, alpha)
             surf.set_at((x, y), gs_color)
     return surf
