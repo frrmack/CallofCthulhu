@@ -115,8 +115,7 @@ try:
         storydeck.add(storycard)
 
     # NEW GAME SETUP
-    game = Game(P1,P2)
-    game.screen = screen
+    game = Game(screen, P1,P2)
     P1.screen = screen
     P2.screen = screen
 
@@ -154,14 +153,14 @@ try:
     screen.readClick()
 
     # P1 starts 
-    ActivePlayer = P1
-    DefendingPlayer = P2
+    game.ActivePlayer = P1
+    game.DefendingPlayer = P2
 
 
     # PLAY FOR A LIMITED NUMBER OF TURNS (for now, coding and debugging)
 
     for turn in range(20):
-        printTurnHeader("__________ START %s's TURN ___________\n" % ActivePlayer.name)
+        printTurnHeader("__________ START %s's TURN ___________\n" % game.ActivePlayer.name)
 
 
         # REFRESH PHASE
@@ -170,23 +169,23 @@ try:
         # Refresh Domains
         printPhaseHeader('--- REFRESH PHASE -------------------------------\n')
 
-        for card in ActivePlayer.board.cardsOfState('exhausted'):
-            print ActivePlayer.name,'READIES',card
+        for card in game.ActivePlayer.board.cardsOfState('exhausted'):
+            print game.ActivePlayer.name,'READIES',card
             card.ready()
 
-        for domain in ActivePlayer.domains:
+        for domain in game.ActivePlayer.domains:
             if domain.isDrained():
-                print ActivePlayer.name,'REFRESHES',domain
+                print game.ActivePlayer.name,'REFRESHES',domain
                 domain.refresh()
 
-        if len(ActivePlayer.board.cardsOfState('insane')) > 0:
-            card = getDecision.restoreOneInsane(ActivePlayer)
+        if len(game.ActivePlayer.board.cardsOfState('insane')) > 0:
+            card = getDecision.restoreOneInsane(game.ActivePlayer)
             if card is not None:
-                print ActivePlayer.name,'RESTORES',card
+                print game.ActivePlayer.name,'RESTORES',card
                 card.restore()
 
 
-        ActivePlayer.board.redraw()
+        game.ActivePlayer.board.redraw()
 
         screen.readClick()
         print
@@ -200,9 +199,9 @@ try:
             nCards, grammar = 1, 'card'
         else:
             nCards, grammar = 2, 'cards'
-        ActivePlayer.draw(nCards)
-        print ActivePlayer.name, 'draws %i %s' % (nCards,grammar),'\n'
-        # print ActivePlayer.handReport(), '\n'
+        game.ActivePlayer.draw(nCards)
+        print game.ActivePlayer.name, 'draws %i %s' % (nCards,grammar),'\n'
+        # print game.ActivePlayer.handReport(), '\n'
 
 
         screen.readClick()
@@ -214,14 +213,14 @@ try:
         printPhaseHeader('--- RESOURCE PHASE ------------------------------\n')
 
         # get decision
-        card, domain = getDecision.attachOneCardToADomain(ActivePlayer)
+        card, domain = getDecision.attachOneCardToADomain(game.ActivePlayer)
 
 
-        print ActivePlayer.name, 'ATTACHES', card, '\n\t TO', domain, '\n'
-        ActivePlayer.attach2Domain(card, domain)
+        print game.ActivePlayer.name, 'ATTACHES', card, '\n\t TO', domain, '\n'
+        game.ActivePlayer.attach2Domain(card, domain)
 
         # Report
-        # print ActivePlayer.domainReport(), '\n'
+        # print game.ActivePlayer.domainReport(), '\n'
 
         # ACTIONS
 
@@ -232,7 +231,7 @@ try:
 
         while True:
             # keep playing until you choose no card to play
-            card, target, domain = getDecision.playCardFromHand(ActivePlayer)
+            card, target, domain = getDecision.playCardFromHand(game.ActivePlayer)
 
             if card is None:
                 break 
@@ -240,17 +239,17 @@ try:
             # target stuff is not coded yet
 
             if domain is None:
-                print ActivePlayer.name, 'PLAYS', card, '\n'
+                print game.ActivePlayer.name, 'PLAYS', card, '\n'
             else:
-                print ActivePlayer.name, 'PLAYS %s USING %s \n' % (card, domain)
+                print game.ActivePlayer.name, 'PLAYS %s USING %s \n' % (card, domain)
 
-            ActivePlayer.play(card, target, domain)
+            game.ActivePlayer.play(card, target, domain)
             screen.readClick()
 
 
         # Report
         # print game.report(), '\n'
-        # print ActivePlayer.report(), '\n'
+        # print game.ActivePlayer.report(), '\n'
 
 
 
@@ -269,17 +268,17 @@ try:
             while True:
                 # keep committing until you choose no character to commit
 
-                character, story = getDecision.commitCharacterToStoryWhenActive(ActivePlayer)
+                character, story = getDecision.commitCharacterToStoryWhenActive(game.ActivePlayer)
 
                 if character is None:
                     break
 
-                print ActivePlayer.name,'COMMITS',character,'\n\t TO',story,'\n'
-                ActivePlayer.commit(character, story)
+                print game.ActivePlayer.name,'COMMITS',character,'\n\t TO',story,'\n'
+                game.ActivePlayer.commit(character, story)
 
         # Report
         # print game.report(showCommitted=True), '\n'
-        # print ActivePlayer.report(), '\n'
+        # print game.ActivePlayer.report(), '\n'
 
         screen.readClick()
 
@@ -293,18 +292,18 @@ try:
         while True:
             # keep committing until you choose no character to commit
 
-            character, story = getDecision.commitCharacterToStoryWhenDefending(DefendingPlayer)
+            character, story = getDecision.commitCharacterToStoryWhenDefending(game.DefendingPlayer)
 
             if character is None:
                 break
 
-            print DefendingPlayer.name,'COMMITS',character,'\n\t TO',story,'\n'
-            DefendingPlayer.commit(character, story)
+            print game.DefendingPlayer.name,'COMMITS',character,'\n\t TO',story,'\n'
+            game.DefendingPlayer.commit(character, story)
 
 
         # Report
         print game.report(showCommitted=True), '\n'
-        print ActivePlayer.report(), '\n'
+        print game.ActivePlayer.report(), '\n'
 
         screen.readClick()
 
@@ -321,8 +320,12 @@ try:
             clear(15)
         else:
             for story in activeStories:
-                # print story.report()
+                print storyColor(story.name), 'resolves:'
                 story.resolve()
+
+
+        screen.readClick()
+
 
         # Response to struggles / success
 
@@ -331,7 +334,6 @@ try:
             story.uncommitAll()
 
 
-        screen.readClick()
 
         # ACTIONS
 
@@ -341,11 +343,12 @@ try:
         
         
         # End of turn, swap active player
-        ActivePlayer, DefendingPlayer = DefendingPlayer, ActivePlayer
+        game.ActivePlayer, game.DefendingPlayer = game.DefendingPlayer, game.ActivePlayer
 
         
 except:
     raise
+
 finally:
     print 'SEED:', SEED
 

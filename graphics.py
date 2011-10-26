@@ -145,6 +145,24 @@ class Image(object):
         return self.rect.collidepoint(pos)
 
 
+class TokenImage(Image):
+    def __init__(self, filename, screen=None):
+        Image.__init__(self, pygame.image.load(filename).convert_alpha(), screen)
+        self.surface = scale(self.surface, size=(TOKENEDGE,TOKENEDGE))
+
+    def draw(self, pos):
+        #Don't want tokens in ZoomWindow, so no appending to drawnImages
+        self.drawSurface(self.surface, pos)
+        self.pos = x,y = pos
+        self.rect = self.surface.get_rect().move(x,y)
+        return self
+
+
+class SuccessTokenImage(TokenImage):
+    def __init__(self, screen=None):
+        TokenImage.__init__(self, SUCCESSTOKENIMAGE, screen)
+
+
 class CardImage(Image):
     regularSize = (CARDWIDTH, CARDHEIGHT)
     zoomSize = (ZOOMEDCARDWIDTH, ZOOMEDCARDHEIGHT)
@@ -203,6 +221,8 @@ class CardImage(Image):
             self.turned180 = False
         self.turnLeft()
         self.turnLeft()
+
+
 
 
 class StoryImage(CardImage):

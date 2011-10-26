@@ -1,9 +1,15 @@
+from collections import defaultdict
 from util import *
 from layout import *
 from card import Card
-from graphics import StoryImage
+from graphics import StoryImage, SuccessTokenImage
 import getDecision
 from pygame import Rect
+
+
+
+
+
 
 class Struggle:
     def __init__(self, name):
@@ -29,12 +35,17 @@ class Struggle:
             self.loser  = story.Player2
         elif P1total < P2total:
             # Player 2 wins struggle
-            self.winner = story.Player1
-            self.loser  = story.Player2
+            self.winner = story.Player2
+            self.loser  = story.Player1
         else:
             # Nobody wins, it's a tie
             self.winner = None
             self.loser  = None
+
+        if self.winner is None:
+            print struggleColor(self.name)+':','Tie [%i vs %i]' % (P1total,P2total)
+        else:
+            print struggleColor(self.name)+':',boldColor(self.winner.name),'wins [%i vs %i]' % (P1total,P2total)
 
         return self.winner, self.loser
 
@@ -107,11 +118,31 @@ class SkillStruggle(Struggle):
     def __init__(self):
         Struggle.__init__(self, name='Skill')
 
+    def resolve(self):
+        winner, loser = Struggle.resolve(self)
+        if winner == self.story.game.DefendingPlayer or winner == None:
+            self.winner, self.loser = None,None
+            print boldColor(self.story.game.ActivePlayer.name), 'IS UNSUCCESSFUL'
+        else:
+            print boldColor(winner.name), 'IS SUCCESSFUL'
+            if len(self.story.committed[loser]) == 0:
+                print boldColor(winner.name), 'IS UNCHALLENGED'
+        return None, None
+
     def processAftermath(self):
         #  Apply struggle consequences to
         #  self.winner and self.loser
 
-        pass
+        if self.winner is not None:
+            self.story.success[self.winner] += 1
+            if len(self.story.committed[self.loser]) == 0:
+                self.story.success[self.winner] += 1
+            if self.story.success[self.winner] >= 5:
+                print boldColor(self.winner.name),'WINS THE STORY', storyColor(self.story.name)
+                self.story.success[self.winner] = 5
+                # MORE ON WINNING HERE!!!!!!!!!!!!!!!!!!
+            else:
+                self.story.redraw()
 
         # Reset the winner/loser
         self.winner, self.loser = None, None
@@ -225,6 +256,12 @@ class Story(Card):
         self.success[self.Player2] = 0
         self.rect[self.Player1] = Rect(0,0,0,0)
         self.rect[self.Player2] = Rect(0,0,0,0)
+        # Create a bunch of success tokens at boot-up to use (fast) in the game
+        self.successTokenBag = []
+        for i in range(10):
+            token = SuccessToken(screen=self.game.screen)
+            self.successTokenBag.append(token)
+        # Graphics
         if hasattr(self, 'image') and self.image != None:
             self.image.addToScreen(self.game.screen)
         if graphicsOn(self.game):
@@ -234,12 +271,6 @@ class Story(Card):
     def resolve(self):
         for struggle in self.struggles:
             Winner, Loser = struggle.resolve()
-
-            if Winner is None:
-                print 'THE',struggleColor(struggle.name),'STRUGGLE ENDS UP IN A TIE'
-            else:
-                print boldColor(Winner.name),'WINS THE',struggleColor(struggle.name),'STRUGGLE'
-
             struggle.processAftermath()        
 
 
@@ -300,6 +331,29 @@ class Story(Card):
         self.clearCommitted(player)
         self.drawCommitted(player)
 
+    def draw(self, pos):
+        Card.draw(self, pos)
+        x,y = pos
+        print self.name, 'P1 success', self.success[self.Player1]
+        print self.name, 'P2 success', self.success[self.Player2]
+        for i in range(self.success[self.Player1]):
+            pos = x + i*TOKENEDGE, y+CARDWIDTH-TOKENEDGE
+            self.successTokenBag[i].draw(pos)
+        for i in range(self.success[self.Player2]):
+            pos = x + i*TOKENEDGE, y
+            self.successTokenBag[i+5].draw(pos)
+
+            
+    def redraw(self):
+        self.draw(self.pos)
+
+
+class SuccessToken(object):
+    def __init__(self,screen=None):
+        self.image = SuccessTokenImage(screen=screen)
+    
+    def draw(self,pos):
+        self.image.draw(pos)
 
 
 

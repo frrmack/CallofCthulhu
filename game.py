@@ -20,7 +20,8 @@ import getDecision
 
 # DEFINITIONS
 class Game:
-    def __init__(self, Player1, Player2):
+    def __init__(self, screen, Player1, Player2):
+        self.screen = screen
         self.storydeck = []
         self.stories = [None, None, None]
 
@@ -31,6 +32,8 @@ class Game:
         Player2.game = self
         Player1.position = "Player 1"
         Player2.position = "Player 2"
+        Player1.screen = screen
+        Player2.screen = screen
 
         self.P1domains = Player1.domains
         self.P1board = Player1.board
@@ -78,6 +81,7 @@ class Game:
         for i in range(3):
             pos = (x + i*(step), y)
             self.stories[i].image.draw(pos)
+            self.stories[i].pos = pos
             self.stories[i].spaceBetween = space
 
 
