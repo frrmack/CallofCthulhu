@@ -135,11 +135,11 @@ try:
     game.drawStories()
     screen.update()
 
-    # Draw 8 cards each
+    # Draw 8 cards each from the deck
     print '%s DRAWS 8 cards' % P1.name
     print '%s DRAWS 8 cards\n' % P2.name
-    P1.draw(8)
-    P2.draw(8)
+    P1.drawCard(8)
+    P2.drawCard(8)
 
     screen.readClick()
 
@@ -161,6 +161,7 @@ try:
 
     for turn in range(20):
         printTurnHeader("__________ START %s's TURN ___________\n" % game.ActivePlayer.name)
+        game.screen.msgBox("%s's turn starts" % game.ActivePlayer.name)
 
 
         # REFRESH PHASE
@@ -199,7 +200,7 @@ try:
             nCards, grammar = 1, 'card'
         else:
             nCards, grammar = 2, 'cards'
-        game.ActivePlayer.draw(nCards)
+        game.ActivePlayer.drawCard(nCards)
         print game.ActivePlayer.name, 'draws %i %s' % (nCards,grammar),'\n'
         # print game.ActivePlayer.handReport(), '\n'
 
@@ -320,9 +321,9 @@ try:
             clear(15)
         else:
             for story in activeStories:
-                print storyColor(story.name), 'resolves:'
+                print storyColor(story.name), 'is resolved:'
                 story.resolve()
-
+                print
 
         screen.readClick()
 

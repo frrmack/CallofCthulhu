@@ -140,6 +140,8 @@ class SkillStruggle(Struggle):
             if self.story.success[self.winner] >= 5:
                 print boldColor(self.winner.name),'WINS THE STORY', storyColor(self.story.name)
                 self.story.success[self.winner] = 5
+                self.story.redraw()
+                self.winner.winStory(self.story)
                 # MORE ON WINNING HERE!!!!!!!!!!!!!!!!!!
             else:
                 self.story.redraw()

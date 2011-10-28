@@ -43,6 +43,8 @@ class Game:
         self.P2board = Player2.board
         self.P2discard = Player2.discardPile
 
+        self.winner = None
+
     #-- Reports
     def storyReport(self, showCommitted=False):
         report = reportColor('STORIES\n')
@@ -65,16 +67,41 @@ class Game:
     def drawStoryCard(self, storyslot):
         story = self.storydeck.pop()
         story.enterGame(self, storyslot)
+        return story
 
-    
     def initiateStories(self):
         self.drawStoryCard(0)
         self.drawStoryCard(1)
         self.drawStoryCard(2)
 
+    def replace(self, story):
+        story.uncommitAll()
+        slot = self.stories.index(story)
+        newStory = self.drawStoryCard(slot)
+        self.drawStoryOnScreen(newStory, slot)
+        newStory.drawCommitted(self.Player1)
+
+
+    def win(self, player):
+        self.winner = player
+        print boldColor(player.name), printTurnHeader("WINS THE GAME!!!!!")
+        self.screen.msgBox("%s wins the game!" % player.name)
+        sys.exit() # REMOVE LATER!
+    
+    #-- Graphics
+    def drawStoryOnScreen(self, story, slot):
+        x = LEFTPANELWIDTH + self.spaceBetweenStories
+        y = self.screen.height//2 - CARDWIDTH//2
+        step = CARDHEIGHT + self.spaceBetweenStories
+        pos = (x + slot*step, y)
+        story.image.draw(pos)
+        story.pos = pos
+        story.spaceBetween = self.spaceBetweenStories
+
     def drawStories(self):
         storypanelwidth = self.screen.width - ZOOMEDCARDHEIGHT - LEFTPANELWIDTH
         space = (storypanelwidth - 3*CARDHEIGHT) // 4
+        self.spaceBetweenStories = space
         x = LEFTPANELWIDTH + space
         y = self.screen.height//2 - CARDWIDTH//2
         step = CARDHEIGHT + space
@@ -83,6 +110,7 @@ class Game:
             self.stories[i].image.draw(pos)
             self.stories[i].pos = pos
             self.stories[i].spaceBetween = space
+
 
 
 

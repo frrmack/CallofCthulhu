@@ -1,4 +1,5 @@
 import sys, pygame
+from pygame.locals import *
 from util import *
 from layout import *
 
@@ -80,13 +81,84 @@ class Screen(object):
             for event in pygame.event.get():
 
                 # window closed
-                if event.type in (pygame.QUIT, pygame.KEYDOWN):
+                if event.type == QUIT or (event.type == KEYDOWN and event.key in (K_ESCAPE, K_SPACE)):
                     sys.exit()
 
                 # click
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     return event.pos
 
+                # [Enter]
+                elif event.type == KEYDOWN and event.key == K_RETURN:
+                    return None
+
+
+    def msgBox(self, message, OKBox=False):
+        # okBox default should be True
+        # when I'm done with debugging!
+
+        # define layout
+        MESSAGEBOXWIDTH, MESSAGEBOXHEIGHT = 300, 140
+        MESSAGEBOXFONTSIZE = 18
+        BORDERTHICKNESS = 5
+        # snapshot of how the screen looked before
+        backup = self.surface.copy()
+        # define the box
+        msgBox = pygame.Surface((MESSAGEBOXWIDTH, MESSAGEBOXHEIGHT))
+        font = pygame.font.Font(None, MESSAGEBOXFONTSIZE)
+        # colors
+        textcolor = 188, 189, 172
+        backg = 59, 45, 56
+        buttonbackg = 255, 255, 255
+        buttontextcolor = 59, 45, 56
+        border = 5, 5, 5
+        borderedge = 60, 60, 60
+        # Fill background
+        msgBox.fill(borderedge)
+        withinBorders = msgBox.get_rect().inflate(-2, -2)
+        msgBox.fill(border, withinBorders)
+        withinBorders = msgBox.get_rect().inflate(-2*BORDERTHICKNESS, -2*BORDERTHICKNESS)
+        msgBox.fill(backg, withinBorders)
+        # OK box
+        if OKBox:
+            ok = font.render('OK', 1, buttontextcolor)
+            okbox = ok.get_rect().inflate(20, 10)
+            okbox.centerx = msgBox.get_rect().centerx
+            okbox.bottom = msgBox.get_rect().bottom - 10
+            msgBox.fill(buttonbackg, okbox)
+            msgBox.blit(ok, okbox.inflate(-20, -10))
+        # Message text
+        msgHeight = font.get_height()*len(message.split('\n'))
+        if OKBox:
+            msgHeight += 20 + font.get_height()
+        y = (MESSAGEBOXHEIGHT - msgHeight) // 2
+        for text in message.split('\n'):
+            msg = font.render(text, 1, textcolor)
+            x = (msgBox.get_width() - msg.get_width())//2
+            pos = x,y
+            msgBox.blit(msg, pos)
+            y += font.get_height()
+        # Draw on screen
+        pos = self.height//2 - 140//2, self.width//2 - 460//2
+        if OKBox:
+            okbox.move_ip(pos)
+        self.blit(msgBox, pos)
+        pygame.display.flip()
+        # Get Input
+        while 1:
+            e = pygame.event.wait()
+            if e.type == QUIT or (e.type == KEYDOWN and e.key in (K_ESCAPE, K_SPACE)):
+                pygame.quit()
+            elif e.type == KEYDOWN and e.key == K_RETURN:
+                break
+            elif OKBox and e.type == MOUSEBUTTONDOWN and okbox.collidepoint(e.pos):
+                break
+            elif not OKBox and e.type == MOUSEBUTTONDOWN:
+                break
+
+        #return to how you were before 
+        self.blit(backup, (0,0))
+        pygame.display.update()
 
 
 

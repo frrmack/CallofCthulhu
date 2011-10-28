@@ -115,7 +115,9 @@ class Player:
         self.domainPanel = DomainPanel(self)
         self.domains = self.domainPanel.domains
         self.discardPile = DiscardPile(self)
+        self.wonStories = CardHeap()
         self.hand = Hand(self)
+
         
     #-- Reports
     def handReport(self):
@@ -195,16 +197,13 @@ class Player:
                 story.redrawCommitted(self)
 
 
-
-    def draw(self, n=1):
+    def drawCard(self, n=1):
         for i in range(n):
             card = self.deck.pop()
             if hasattr(self.game, 'screen'):
                 card.setScreen(self.game.screen)
             self.hand.add(card)
 
-    def drawDomainsOnScreen(self):
-        self.domainPanel.draw()
 
     def payCost(self, card, domain):
         if domain is None:
@@ -265,6 +264,16 @@ class Player:
         if character.wounds > character.toughness:
             self.destroy(character)
 
+    def winStory(self, story):
+        self.screen.msgBox("%s wins the story\n%s!" % (self.name, story.name))
+        self.wonStories.add(story)
+        if len(self.wonStories) >= 3:
+            # win the game
+            self.game.win(self)
+        self.game.replace(story)
+        
+
+
     def destroy(self, card):
         if card.controller != self:
             raise RuleError("You can only destroy cards under your control")
@@ -277,4 +286,10 @@ class Player:
             raise RuleError("You cannot destroy that card")
         # put in your discard pile
         self.discardPile.add(card)
+
+
+    #-- Graphics
+    def drawDomainsOnScreen(self):
+        self.domainPanel.draw()
+
         
