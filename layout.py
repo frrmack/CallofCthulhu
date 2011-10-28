@@ -23,7 +23,9 @@ DISCARDWIDTH  = CARDWIDTH // 2
 DISCARDHEIGHT = CARDHEIGHT // 2
 
 CARDBACKIMAGE = "Images/cardBack.jpg"
-SUCCESSTOKENIMAGE = "Images/success_token.png"
+SUCCESSTOKENIMAGE = "Images/success_token_alpha.png"
+WOUNDTOKENIMAGE = "Images/wound_token_alpha.png"
+CTHULHUICON = "Images/cthulhu_icon_2.png"
 
 # GENERAL
 SMALLMARGIN = CARDWIDTH // 25

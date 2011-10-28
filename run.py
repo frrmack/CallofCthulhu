@@ -161,7 +161,7 @@ try:
 
     for turn in range(20):
         printTurnHeader("__________ START %s's TURN ___________\n" % game.ActivePlayer.name)
-        game.screen.msgBox("%s's turn starts" % game.ActivePlayer.name, colorscheme=1)
+        game.screen.msgBox("%s's turn starts" % game.ActivePlayer.name)
 
 
         # REFRESH PHASE

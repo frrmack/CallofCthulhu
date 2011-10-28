@@ -203,24 +203,23 @@ class Character(Card):
             raise RuleError("This character is already insane.")
         else:
             self.state = 'insane'
-            if graphicsOn(self.owner):
-                x,y = self.image.pos
-                x -= toInt( (CARDHEIGHT - CARDWIDTH)/2. )
-                y += toInt( (CARDHEIGHT - CARDWIDTH)/2. )
-                pos = x,y
-                self.image.clear()
+            x,y = self.image.pos
+            x -= toInt( (CARDHEIGHT - CARDWIDTH)/2. )
+            y += toInt( (CARDHEIGHT - CARDWIDTH)/2. )
+            pos = x,y
+            self.image.clear()
+            for card in self.attached:
+                card.image.clear()
+            if not self.isExhausted():
+                self.image.turnLeft()
                 for card in self.attached:
-                    card.image.clear()
-                if not self.isExhausted():
-                    self.image.turnLeft()
-                    for card in self.attached:
-                        card.image.turnRight()
-                self.image.flipCard()
-                for card in self.attached:
-                    card.image.flipCard()
-                if draw:
-                    self.draw(pos)
-                    self.owner.screen.update()
+                    card.image.turnRight()
+            self.image.flipCard()
+            for card in self.attached:
+                card.image.flipCard()
+            if draw:
+                self.draw(pos)
+
 
     def restore(self, draw=True):
         if not self.isInsane():

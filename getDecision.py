@@ -47,9 +47,15 @@ def commitCharacterToStoryWhenDefending(Player):
         raise RuleError("HUMAN PLAYERS NOT CODED YET")
     
 
-def chooseOneFromStoryToGoInsane(Player):
+def chooseOneFromStoryToGoInsane(Player, story):
     if isAI(Player):
-        return Player.chooseOneFromStoryToGoInsane()
+        return Player.chooseOneFromStoryToGoInsane(story)
+    else:
+        raise RuleError("HUMAN PLAYERS NOT CODED YET")
+
+def chooseOneFromStoryToReady(Player, story):
+    if isAI(Player):
+        return Player.chooseOneFromStoryToReady(story)
     else:
         raise RuleError("HUMAN PLAYERS NOT CODED YET")
 

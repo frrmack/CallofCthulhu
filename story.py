@@ -67,9 +67,12 @@ class TerrorStruggle(Struggle):
     def processAftermath(self):
         #  Apply struggle consequences to
         #  self.winner and self.loser
-        Winner, Loser = self.winner, self.loser
-        if Loser is not None:
-            getDecision.chooseOneFromStoryToGoInsane(Loser)
+        pass
+        # if self.loser is not None and len(self.story.committed[self.loser]) > 0:
+        #     target = getDecision.chooseOneFromStoryToGoInsane(self.loser, self.story)
+        #     target.goInsane()
+        #     self.story.redrawCommitted(self.loser)
+        #     print boldColor(self.winner.name),'chooses', target.name,'to go insane.'
 
         # Reset the winner/loser
         self.winner, self.loser = None, None
@@ -95,8 +98,12 @@ class ArcaneStruggle(Struggle):
     def processAftermath(self):
         #  Apply struggle consequences to
         #  self.winner and self.loser
-
         pass
+        # if self.winner is not None and len(self.story.committed[self.winner]) > 0:
+        #     target = getDecision.chooseOneFromStoryToGoInsane(self.winner, self.story)
+        #     target.ready()
+        #     self.story.redrawCommitted(self.winner)
+        #     print boldColor(self.winner.name),'readies', target.name
 
         # Reset the winner/loser
         self.winner, self.loser = None, None
@@ -115,7 +122,6 @@ class InvestigationStruggle(Struggle):
                 self.story.success[self.winner] = 5
                 self.story.redraw()
                 self.winner.winStory(self.story)
-                # MORE ON WINNING HERE!!!!!!!!!!!!!!!!!!
             else:
                 self.story.redraw()
 
@@ -149,7 +155,6 @@ class SkillStruggle(Struggle):
                 self.story.success[self.winner] = 5
                 self.story.redraw()
                 self.winner.winStory(self.story)
-                # MORE ON WINNING HERE!!!!!!!!!!!!!!!!!!
             else:
                 self.story.redraw()
 

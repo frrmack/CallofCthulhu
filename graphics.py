@@ -327,6 +327,11 @@ class DomainImage(CardImage):
         self.turnRight()
         self.freshSurface = self.surface
         self.drainedSurface = grayscaleCopy(self.surface)
+        cthulhuIcon = pygame.image.load(CTHULHUICON).convert_alpha()
+        cthulhuIcon = scale(cthulhuIcon, size = (TOKENEDGE, TOKENEDGE))
+        x = CARDHEIGHT - DOMAINWIDTH + ((DOMAINWIDTH-TOKENEDGE)//2)
+        y = (CARDWIDTH - TOKENEDGE) // 2
+        self.drainedSurface.blit(cthulhuIcon, (x,y))
         # self.drainedSurface = pygame.image.load(DRAINEDDOMAINIMAGE).convert()
         # self.drainedSurface = scale(self.drainedSurface, size=self.regularSize)
         # self.drainedSurface = pygame.transform.rotate(self.drainedSurface,270)

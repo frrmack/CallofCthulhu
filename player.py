@@ -5,6 +5,7 @@ from cardheap import CardHeap, Deck, Hand, DiscardPile
 from domain import DomainPanel
 from layout import *
 
+
 class Board:
     # A player's board
     # (not the whole game board)
@@ -265,12 +266,13 @@ class Player:
             self.destroy(character)
 
     def winStory(self, story):
-        self.screen.msgBox("%s wins the story\n%s!" % (self.name, story.name))
+        self.screen.msgBox("%s wins the story\n%s!" % (self.name, story.name), colorscheme=1)
         self.wonStories.add(story)
         if len(self.wonStories) >= 3:
             # win the game
             self.game.win(self)
         self.game.replace(story)
+        # MORE ON WINNING HERE!!!!!!!!!!!!!!!!!!
         
 
 
