@@ -85,7 +85,7 @@ class Game:
     def win(self, player):
         self.winner = player
         print boldColor(player.name), printTurnHeader("WINS THE GAME!!!!!")
-        self.screen.msgBox("%s wins the game!" % player.name)
+        self.screen.msgBox("%s wins the game!" % player.name, colorscheme=2)
         sys.exit() # REMOVE LATER!
     
     #-- Graphics

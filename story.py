@@ -108,8 +108,16 @@ class InvestigationStruggle(Struggle):
     def processAftermath(self):
         #  Apply struggle consequences to
         #  self.winner and self.loser
-
-        pass
+        if self.winner is not None:
+            self.story.success[self.winner] += 1
+            if self.story.success[self.winner] >= 5:
+                print boldColor(self.winner.name),'WINS THE STORY', storyColor(self.story.name)
+                self.story.success[self.winner] = 5
+                self.story.redraw()
+                self.winner.winStory(self.story)
+                # MORE ON WINNING HERE!!!!!!!!!!!!!!!!!!
+            else:
+                self.story.redraw()
 
         # Reset the winner/loser
         self.winner, self.loser = None, None
@@ -132,7 +140,6 @@ class SkillStruggle(Struggle):
     def processAftermath(self):
         #  Apply struggle consequences to
         #  self.winner and self.loser
-
         if self.winner is not None:
             self.story.success[self.winner] += 1
             if len(self.story.committed[self.loser]) == 0:
@@ -328,7 +335,6 @@ class Story(Card):
             if card in screen.drawnImages:
                 screen.drawnImages.remove(card.image)
 
-        
     def redrawCommitted(self, player):
         self.clearCommitted(player)
         self.drawCommitted(player)
@@ -345,7 +351,6 @@ class Story(Card):
             pos = x + i*TOKENEDGE, y
             self.successTokenBag[i+5].draw(pos)
 
-            
     def redraw(self):
         self.draw(self.pos)
 

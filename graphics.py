@@ -93,7 +93,7 @@ class Screen(object):
                     return None
 
 
-    def msgBox(self, message, OKBox=False):
+    def msgBox(self, message, OKBox=False, colorscheme=0):
         # okBox default should be True
         # when I'm done with debugging!
 
@@ -107,12 +107,30 @@ class Screen(object):
         msgBox = pygame.Surface((MESSAGEBOXWIDTH, MESSAGEBOXHEIGHT))
         font = pygame.font.Font(None, MESSAGEBOXFONTSIZE)
         # colors
-        textcolor = 188, 189, 172
-        backg = 59, 45, 56
-        buttonbackg = 255, 255, 255
-        buttontextcolor = 59, 45, 56
-        border = 5, 5, 5
-        borderedge = 60, 60, 60
+        if colorscheme not in range(1,3):
+            # colorscheme 0
+            textcolor = 188, 189, 172
+            backg = 59, 45, 56
+            buttonbackg = 255, 255, 255
+            buttontextcolor = 59, 45, 56
+            border = 5, 5, 5
+            borderedge = 60, 60, 60
+        elif colorscheme == 1:
+            # colorscheme 1
+            textcolor = 216, 216, 216
+            backg = 46, 52, 54
+            buttonbackg = 206, 92, 0
+            buttontextcolor = 46, 52, 54
+            border = 173, 127, 168
+            borderedge = 221, 191, 218
+        elif colorscheme == 2:
+            # colorscheme 2
+            textcolor = 209, 146, 50
+            backg = 19, 17, 20
+            buttonbackg = 221, 78, 34
+            buttontextcolor = 19, 17, 20
+            border = 69, 127, 123
+            borderedge = 73, 135, 65
         # Fill background
         msgBox.fill(borderedge)
         withinBorders = msgBox.get_rect().inflate(-2, -2)
