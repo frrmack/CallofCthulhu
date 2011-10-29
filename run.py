@@ -57,8 +57,8 @@ backgrounds = ("cthulhu_1440x900.jpg",               #0
 ###############################
 ##### CHOOSE DISPLAY MODE #####
 
-resolution = 4    # 4  5  6
-fullscreen = 0    # 0  0  1
+resolution = 1    # 4  5  6
+fullscreen = 1    # 0  0  1
 background = 6    # 7  0  0
 
 ###############################
@@ -140,6 +140,8 @@ try:
     print '%s DRAWS 8 cards\n' % P2.name
     P1.drawCard(8)
     P2.drawCard(8)
+
+    screen.msgBox("%s x %s" % (screen.width, screen.height), OKBox=True)
 
     screen.readClick()
 

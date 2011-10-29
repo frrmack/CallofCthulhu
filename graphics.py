@@ -93,7 +93,7 @@ class Screen(object):
                     return None
 
 
-    def msgBox(self, message, OKBox=False, colorscheme=0):
+    def msgBox(self, message, pos=None, OKBox=False, colorscheme=0):
         # okBox default should be True
         # when I'm done with debugging!
 
@@ -153,11 +153,11 @@ class Screen(object):
         for text in message.split('\n'):
             msg = font.render(text, 1, textcolor)
             x = (msgBox.get_width() - msg.get_width())//2
-            pos = x,y
-            msgBox.blit(msg, pos)
+            msgBox.blit(msg, (x,y))
             y += font.get_height()
         # Draw on screen
-        pos = self.height//2 - 140//2, self.width//2 - 460//2
+        if pos is None:
+            pos = self.width//2 - MESSAGEBOXWIDTH//2, self.height//2 - MESSAGEBOXHEIGHT//2
         if OKBox:
             okbox.move_ip(pos)
         self.blit(msgBox, pos)
@@ -166,7 +166,7 @@ class Screen(object):
         while 1:
             e = pygame.event.wait()
             if e.type == QUIT or (e.type == KEYDOWN and e.key in (K_ESCAPE, K_SPACE)):
-                pygame.quit()
+                sys.exit()
             elif e.type == KEYDOWN and e.key == K_RETURN:
                 break
             elif OKBox and e.type == MOUSEBUTTONDOWN and okbox.collidepoint(e.pos):

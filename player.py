@@ -189,13 +189,8 @@ class Player:
             self.board.characters.remove(card)
             card.exhaust(draw=False)
             story.committed[self].append(card)
-            if graphicsOn(self):
-                if self.position == "Player 1":
-                    for attachment in card.attached:
-                        attachment.image.turn180()
-                    card.image.turn180()
-                self.board.redraw()
-                story.redrawCommitted(self)
+            self.board.redraw()
+            story.redrawCommitted(self)
 
 
     def drawCard(self, n=1):

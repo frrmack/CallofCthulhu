@@ -294,10 +294,6 @@ class Story(Card):
     def uncommitAll(self):
         for player, committed in self.committed.items():
             for card in committed[:]:
-                if graphicsOn(player) and player.position == "Player 1":
-                    for attachment in card.attached:
-                        attachment.image.turn180()
-                    card.image.turn180()
                 committed.remove(card)
                 player.board.add(card)
             if graphicsOn(player):
@@ -317,7 +313,7 @@ class Story(Card):
         if position == "Player 1":
             y += CARDWIDTH
             i = 0
-            for i in range(len(committed)):
+            for i in range(len(committed)-1,-1,-1):
                 card = committed[i]
                 pos = (x,y+step*i)
                 card.draw(pos)
