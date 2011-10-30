@@ -13,6 +13,7 @@ class Card:
         self.owner = None
         self.controller = None
         self.type = None
+        self.position = None
         self.attached = []
         self.struggles = []
         self.subtypes = []
@@ -62,51 +63,65 @@ class Card:
     def isReady(self):
         return self.isInState('ready')
 
+    def isInsane(self):
+        return self.isInState('insane')
+
     #-- Actions
-    def exhaust(self, draw=True):
+    def exhaust(self, draw=False):
         if not self.isReady():
             raise RuleError("You can only exhaust a ready character")
         else:
             self.state = 'exhausted'
-        if graphicsOn(self.owner):
-            x,y = self.image.pos
-            x -= toInt( (CARDHEIGHT - CARDWIDTH)/2. )
-            y += toInt( (CARDHEIGHT - CARDWIDTH)/2. )
-            pos = x,y
-            self.image.clear()
-            self.image.turnLeft()
-            for card in self.attached:
-                card.image.clear()
-                card.image.turnLeft()
-            if draw:
-                self.draw(pos)
-                self.owner.screen.update()
+        x,y = self.image.pos
+        x -= toInt( (CARDHEIGHT - CARDWIDTH)/2. )
+        y += toInt( (CARDHEIGHT - CARDWIDTH)/2. )
+        pos = x,y
+        self.image.clear()
+        self.image.turnLeft()
+        for card in self.attached:
+            card.image.clear()
+            card.image.turnLeft()
+        if draw:
+            self.draw(pos)
+            self.owner.screen.update()
 
 
-    def ready(self, draw=True):
+    def ready(self, draw=False):
         if not self.isExhausted():
             raise RuleError("You can only ready an exhausted character")
         else:
             self.state = 'ready'
-        if graphicsOn(self.owner):
-            x,y = self.image.pos
-            x += toInt( (CARDHEIGHT - CARDWIDTH)/2. )
-            y -= toInt( (CARDHEIGHT - CARDWIDTH)/2. )
-            pos = x,y
-            self.image.clear()
-            self.image.turnRight()
-            for card in self.attached:
-                card.image.clear()
-                card.image.turnRight()
-            if draw:
-                self.image.draw(pos)
-                self.owner.screen.update()
+        x,y = self.image.pos
+        x += toInt( (CARDHEIGHT - CARDWIDTH)/2. )
+        y -= toInt( (CARDHEIGHT - CARDWIDTH)/2. )
+        pos = x,y
+        self.image.clear()
+        self.image.turnRight()
+        for card in self.attached:
+            card.image.clear()
+            card.image.turnRight()
+        if draw:
+            self.image.draw(pos)
+            self.owner.screen.update()
             
     def attach(self, card):
+        if self.isInsane():
+            msg = "You cannot attach a card to an insane character."
+            raise GameError(msg)
+        if self.isExhausted():
+            card.image.turnLeft()
         self.attached.append(card)
 
     def getAttachedTo(self, card):
         card.attach(self)
+
+    def die(self):
+        #remove and kill attachments first
+        for i in range(len(self.attached)):
+            card = self.attached.pop()
+            card.owner.discardPile.add(card)
+        self.position.remove(self)
+        self.owner.discardPile.add(self)
 
     #-- Graphics
     def setScreen(self, screen):
@@ -197,12 +212,18 @@ class Character(Card):
     def isInsane(self):
         return self.isInState('insane')
 
+    def canGoInsane(self):
+        if 'Willpower' in self.keywords or self.terror >0 or self.isInsane():
+            return False
+        else:
+            return True
+
+
     #-- Actions
-    def goInsane(self, draw=True):
+    def goInsane(self, draw=False):
         if self.isInsane():
             raise RuleError("This character is already insane.")
         else:
-            self.state = 'insane'
             x,y = self.image.pos
             x -= toInt( (CARDHEIGHT - CARDWIDTH)/2. )
             y += toInt( (CARDHEIGHT - CARDWIDTH)/2. )
@@ -213,29 +234,40 @@ class Character(Card):
             if not self.isExhausted():
                 self.image.turnLeft()
                 for card in self.attached:
-                    card.image.turnRight()
+                    card.image.turnLeft()
             self.image.flipCard()
             for card in self.attached:
                 card.image.flipCard()
             if draw:
                 self.draw(pos)
+            self.state = 'insane'
+            # lose attachments 
+            for i in range(len(self.attached)):
+                card = self.attached.pop()
+                card.owner.discardPile.add(card)
+            # lose toughness
+            self.tempToughness = self.toughness
+            self.toughness = 0
+            if self.wounds > self.toughness:
+                self.die()
 
 
-    def restore(self, draw=True):
+    def restore(self, draw=False):
         if not self.isInsane():
             raise RuleError("You can only restore insane characters")
         else:
             self.state = 'exhausted'
-        if graphicsOn(self.owner):
-            pos = self.image.pos
-            self.image.clear()
-            self.image.flipCard()
-            for card in self.attached:
-                card.image.clear()
-                card.image.flipCard()
-            if draw:
-                self.draw(pos)
-                self.owner.screen.update()
+        pos = self.image.pos
+        self.image.clear()
+        self.image.flipCard()
+        # for card in self.attached:
+        #     card.image.clear()
+        #     card.image.flipCard()
+        if hasattr(self, tempToughness):
+            self.toughness = self.tempToughness
+        if draw:
+            self.draw(pos)
+            self.owner.screen.update()
 
 
 

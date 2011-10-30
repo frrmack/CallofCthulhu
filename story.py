@@ -67,12 +67,15 @@ class TerrorStruggle(Struggle):
     def processAftermath(self):
         #  Apply struggle consequences to
         #  self.winner and self.loser
-        pass
-        # if self.loser is not None and len(self.story.committed[self.loser]) > 0:
-        #     target = getDecision.chooseOneFromStoryToGoInsane(self.loser, self.story)
-        #     target.goInsane()
-        #     self.story.redrawCommitted(self.loser)
-        #     print boldColor(self.winner.name),'chooses', target.name,'to go insane.'
+        if self.loser is not None:
+            potentials = filter(lambda c: c.canGoInsane(), self.story.committed[self.loser])
+            if len(potentials) > 0:
+                target = getDecision.chooseOneFromStoryToGoInsane(self.loser, self.story)
+                target.goInsane()
+                self.story.uncommit(target)
+                print boldColor(self.winner.name),'chooses', target.name,'to go insane.'
+            else:
+                print 'None of the committed characters can go insane.'
 
         # Reset the winner/loser
         self.winner, self.loser = None, None
@@ -291,14 +294,21 @@ class Story(Card):
     def resolveStruggle(self, struggle):
         return struggle.resolve()
 
+    def uncommit(self, character):
+        player = character.controller
+        committed = self.committed[player]
+        committed.remove(character)
+        player.board.add(character)
+        self.redrawCommitted(player)
+        player.board.redraw()
+
     def uncommitAll(self):
         for player, committed in self.committed.items():
             for card in committed[:]:
                 committed.remove(card)
                 player.board.add(card)
-            if graphicsOn(player):
-                self.redrawCommitted(player)
-                player.board.redraw()
+            self.redrawCommitted(player)
+            player.board.redraw()
 
     #-- Graphics
     def drawCommitted(self, player):

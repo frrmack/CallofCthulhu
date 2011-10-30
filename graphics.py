@@ -157,7 +157,13 @@ class Screen(object):
             y += font.get_height()
         # Draw on screen
         if pos is None:
-            pos = self.width//2 - MESSAGEBOXWIDTH//2, self.height//2 - MESSAGEBOXHEIGHT//2
+            # center
+            #pos = self.width//2 - MESSAGEBOXWIDTH//2, self.height//2 - MESSAGEBOXHEIGHT//2
+            # center-left
+            pos = SMALLMARGIN, self.height//2 - MESSAGEBOXHEIGHT//2
+            # center-right
+            # pos = self.width - MESSAGEBOXWIDTH - SMALLMARGIN, self.height//2 - MESSAGEBOXHEIGHT//2
+            
         if OKBox:
             okbox.move_ip(pos)
         self.blit(msgBox, pos)
@@ -261,8 +267,10 @@ class CardImage(Image):
         self.fileName=fileName
         Image.__init__(self, pygame.image.load(fileName).convert(), screen)
         self.bigSurface = scale(self.surface, size=self.zoomSize)
+        self.orgSurface = self.surface.copy()
         self.surface = scale(self.surface, size=self.regularSize)
         self.backSurface = pygame.image.load(CARDBACKIMAGE).convert()
+        self.orgBackSurface = self.backSurface.copy()
         self.bigBackSurface = scale(self.backSurface, size=self.zoomSize)
         self.backSurface = scale(self.backSurface, size=self.regularSize)
         self.hidden=False
@@ -277,6 +285,7 @@ class CardImage(Image):
         if self.hidden:
             raise GameError("Trying to hide already hidden card")
         self.surface, self.backSurface = self.backSurface, self.surface
+        self.orgSurface, self.orgBackSurface = self.orgBackSurface, self.orgSurface
         self.bigSurface, self.bigBackSurface = self.bigBackSurface, self.bigSurface
         self.hidden = True
 
@@ -285,21 +294,25 @@ class CardImage(Image):
             raise GameError("Trying to unhide a non hidden card")
         # swap again
         self.surface, self.backSurface = self.backSurface, self.surface
+        self.orgSurface, self.orgBackSurface = self.orgBackSurface, self.orgSurface
         self.bigSurface, self.bigBackSurface = self.bigBackSurface, self.bigSurface
         self.hidden = False
 
     def flipCard(self, cardBackFile=CARDBACKIMAGE):
         # surface is switched to cardback, bigSurface (zoom image) stays open
         self.surface, self.backSurface = self.backSurface, self.surface
+        self.orgSurface, self.orgBackSurface = self.orgBackSurface, self.orgSurface
 
     def turnRight(self):
         self.surface = pygame.transform.rotate(self.surface,270)
+        self.backSurface = pygame.transform.rotate(self.backSurface,270)
         self.rect = self.surface.get_rect().move(self.pos)
         self.width, self.height = self.size = self.surface.get_size()
         return self
 
     def turnLeft(self):
         self.surface = pygame.transform.rotate(self.surface,90)
+        self.backSurface = pygame.transform.rotate(self.backSurface,90)
         self.rect = self.surface.get_rect().move(self.pos)
         self.width, self.height = self.size = self.surface.get_size()
         return self

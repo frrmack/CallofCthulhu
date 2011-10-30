@@ -36,22 +36,22 @@ class Hand(CardHeap):
         CardHeap.add(self,card)
         if self.player.position == "Player 2":
             card.image.hide()
-        if graphicsOn(self.player):
-            self.screen = self.player.screen
-            card.image.surface = scale(card.image.surface, size=(HANDCARDWIDTH, HANDCARDHEIGHT))
-            self.redraw()
+        self.screen = self.player.screen
+        card.image.surface = scale(card.image.orgSurface, size=(HANDCARDWIDTH, HANDCARDHEIGHT))
+        card.image.backSurface = scale(card.image.orgBackSurface, size=(HANDCARDWIDTH, HANDCARDHEIGHT))
+        self.redraw()
 
 
     def remove(self, card):
         list.remove(self, card)
         if self.player.position == "Player 2":
             card.image.unhide()
-        if graphicsOn(self.player):
-            self.screen = self.player.screen
-            if card.image in self.screen.drawnImages:
-                self.screen.drawnImages.remove(card.image)
-            card.image.surface = scale(card.image.surface, size=(CARDWIDTH, CARDHEIGHT))
-            self.redraw()
+        self.screen = self.player.screen
+        if card.image in self.screen.drawnImages:
+            self.screen.drawnImages.remove(card.image)
+        card.image.surface = scale(card.image.orgSurface, size=(CARDWIDTH, CARDHEIGHT))
+        card.image.backSurface = scale(card.image.orgBackSurface, size=(CARDWIDTH, CARDHEIGHT))
+        self.redraw()
 
     def belongToPlayer(self, player):
         self.player = player
@@ -112,11 +112,15 @@ class DiscardPile(CardHeap):
 
     def add(self, card):
         CardHeap.add(self,card)
-        if graphicsOn(self.player):
-            self.screen = self.player.screen
-            card.image.surface = scale(card.image.surface, size=(DISCARDWIDTH, DISCARDHEIGHT))
-            card.image.turnLeft()
-            self.redraw()
+        self.screen = self.player.screen
+        card.image.surface = scale(card.image.orgSurface, size=(DISCARDWIDTH, DISCARDHEIGHT))
+        card.image.backSurface = scale(card.image.orgBackSurface, size=(DISCARDWIDTH, DISCARDHEIGHT))
+        if card.isInsane():
+            card.restore()
+        if card.isExhausted():
+            card.ready()
+        card.image.turnLeft()
+        self.redraw()
 
 
     def remove(self, card):
@@ -125,7 +129,8 @@ class DiscardPile(CardHeap):
             self.screen = self.player.screen
             if card.image in self.screen.drawnImages:
                 self.screen.drawnImages.remove(card.image)
-            card.image.surface = scale(card.image.surface, size=(CARDWIDTH, CARDHEIGHT))
+            card.image.surface = scale(card.image.orgSurface, size=(CARDWIDTH, CARDHEIGHT))
+            card.image.backSurface = scale(card.image.orgBackSurface, size=(CARDWIDTH, CARDHEIGHT))
             card.image.turnLeft()
             self.redraw()
 

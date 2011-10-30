@@ -141,7 +141,7 @@ try:
     P1.drawCard(8)
     P2.drawCard(8)
 
-    screen.msgBox("%s x %s" % (screen.width, screen.height), OKBox=True)
+    #screen.msgBox("%s x %s" % (screen.width, screen.height), OKBox=True)
 
     screen.readClick()
 
@@ -186,7 +186,6 @@ try:
             if card is not None:
                 print game.ActivePlayer.name,'RESTORES',card
                 card.restore()
-
 
         game.ActivePlayer.board.redraw()
 

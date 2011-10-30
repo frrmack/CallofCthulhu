@@ -122,7 +122,8 @@ class AI(Player):
 
     def chooseOneFromStoryToGoInsane(self, story):
         # Simple AI --- choose the character with minimum cost
-        return min(story.committed[self], key=lambda c: c.cost)
+        potentials = filter(lambda c: c.canGoInsane(), story.committed[self])
+        return min(potentials, key=lambda c: c.cost)
 
     def chooseOneFromStoryToReady(self, story):
         # Simple AI --- choose the character with maximum cost

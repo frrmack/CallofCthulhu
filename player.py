@@ -76,7 +76,7 @@ class Board:
         for i in range(nCards):
             card = self.cards()[i]
             cardX = x + (CARDWIDTH + spaceWidth)*i
-            if card.isExhausted():
+            if card.isExhausted() or card.isInsane():
                 pos = (cardX, cardY+toInt((CARDHEIGHT - CARDWIDTH)/2.))
             else:
                 pos = (cardX, cardY)
@@ -223,6 +223,7 @@ class Player:
             # play from hand
             self.payCost(card, domain)
             self.hand.remove(card)
+            card.controller = self
 
             # Effect of the card, where does it end up?
             # Playing without a target
