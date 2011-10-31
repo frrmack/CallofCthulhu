@@ -71,9 +71,10 @@ class TerrorStruggle(Struggle):
             potentials = filter(lambda c: c.canGoInsane(), self.story.committed[self.loser])
             if len(potentials) > 0:
                 target = getDecision.chooseOneFromStoryToGoInsane(self.loser, self.story)
+                if target in self.story.committed[self.loser]:
+                    self.story.uncommit(target)
                 target.goInsane()
-                self.story.uncommit(target)
-                print boldColor(self.winner.name),'chooses', target.name,'to go insane.'
+                print boldColor(self.winner.name),'chooses', genericCardColor(target.name),'to go insane.'
             else:
                 print 'None of the committed characters can go insane.'
 
@@ -95,7 +96,7 @@ class CombatStruggle(Struggle):
                 target.wound()
                 self.loser.discardPile.redraw()
                 self.story.redrawCommitted(self.loser)
-                print boldColor(self.winner.name),'chooses', target.name,'to get wounded.'
+                print boldColor(self.winner.name),'chooses', genericCardColor(target.name),'to get wounded.'
             else:
                 print 'None of the committed characters can be wounded.'
 
@@ -111,11 +112,16 @@ class ArcaneStruggle(Struggle):
         #  Apply struggle consequences to
         #  self.winner and self.loser
         pass
-        # if self.winner is not None and len(self.story.committed[self.winner]) > 0:
-        #     target = getDecision.chooseOneFromStoryToGoInsane(self.winner, self.story)
-        #     target.ready()
-        #     self.story.redrawCommitted(self.winner)
-        #     print boldColor(self.winner.name),'readies', target.name
+        if self.winner is not None and len(self.story.committed[self.winner]) > 0:
+            target = getDecision.chooseOneFromStoryToReady(self.winner, self.story)
+            target.ready()
+            self.story.committed[self.winner].remove(target)
+            if self.winner.position == "Player 1":
+                self.story.committed[self.winner].append(target)
+            elif self.winner.position == "Player 2":
+                self.story.committed[self.winner].insert(0, target)
+            self.story.redrawCommitted(self.winner)
+            print boldColor(self.winner.name),'readies', genericCardColor(target.name)
 
         # Reset the winner/loser
         self.winner, self.loser = None, None
@@ -330,27 +336,41 @@ class Story(Card):
             step = toInt(self.committedWindow / (len(committed)-1.))
         step = min((step,COMMITTEDSTEP))
         if position == "Player 1":
+            Y = self.image.pos[1] + CARDWIDTH
             y += CARDWIDTH
             i = 0
             for i in range(len(committed)-1,-1,-1):
                 card = committed[i]
-                pos = (x,y+step*i)
+                if card.isExhausted():
+                    pos = (x,y+step*i)
+                else:
+                    pos = (x-RESOURCEBAR*3//2,Y)
                 card.draw(pos)
-            Y = self.image.pos[1] + CARDWIDTH
             self.rect[player] = Rect(X,Y,CARDHEIGHT+self.spaceBetween, self.committedWindow)
         elif position == "Player 2":
+            Y = self.image.pos[1] - self.committedWindow
             y -= CARDWIDTH
             i = 0
             for i in range(len(committed)):
                 card = committed[i]
-                pos = (x,y-step*i)
+                if card.isExhausted():
+                    pos = (x,y-step*i)
+                else:
+                    pos = (x-RESOURCEBAR*3//2,Y)
                 card.draw(pos)
-            Y = self.image.pos[1] - self.committedWindow
             self.rect[player] = Rect(X-self.spaceBetween,Y,CARDHEIGHT+self.spaceBetween, self.committedWindow)
+
+        self.redraw()
 
     def clearCommitted(self, player):
         screen = player.game.screen
         screen.blit(screen.background.subsurface(self.rect[player]),self.rect[player])
+        x,y = self.image.pos
+        if player.position == "Player 1":
+            leftSpace = Rect(x-self.spaceBetween,y,self.spaceBetween, CARDWIDTH+self.committedWindow)
+        elif player.position == "Player 2":
+            leftSpace = Rect(x-self.spaceBetween,y-self.committedWindow,self.spaceBetween, CARDWIDTH)
+        screen.blit(screen.background.subsurface(leftSpace), leftSpace)
         for card in self.committed[player]:
             if card in screen.drawnImages:
                 screen.drawnImages.remove(card.image)
@@ -362,8 +382,6 @@ class Story(Card):
     def draw(self, pos):
         Card.draw(self, pos)
         x,y = pos
-        print self.name, 'P1 success', self.success[self.Player1]
-        print self.name, 'P2 success', self.success[self.Player2]
         for i in range(self.success[self.Player1]):
             pos = x + i*TOKENEDGE, y+CARDWIDTH-TOKENEDGE
             self.successTokenBag[i].draw(pos)

@@ -235,13 +235,14 @@ class Image(object):
     def clear(self):
         self.screen.blit(self.screen.background.subsurface(self.rect),self.rect)
         self.rect = pygame.Rect(0,0,0,0)
-        self.pos = 0,0
-        self.size = 0,0
-        self.width, self.height = 0,0       
         self.screen.drawnImages.remove(self)
 
-    def redraw(self):
+    def redraw(self, offset=(0,0)):
         self.clear()
+        x,y = self.pos
+        x += offset[0]
+        y += offset[1]
+        self.pos = (x,y)
         self.draw(self.pos)
 
     def scale(self, ratio=None, size=None, width=None, height=None):

@@ -127,8 +127,13 @@ class AI(Player):
 
     def chooseOneFromStoryToWound(self, story):
         # Simple AI --- choose the character with max toughness
+        # If nobody has enough toughness to handle one wound, choose min cost
         potentials = filter(lambda c: c.canBeWounded(), story.committed[self])
-        return max(potentials, key=lambda c: c.toughness - c.wounds)
+        toughest = max(potentials, key=lambda c: c.toughness - c.wounds)
+        if toughest.toughness - toughest.wounds > 0:
+            return toughest
+        else:
+            return min(potentials, key=lambda c: c.cost)
 
     def chooseOneFromStoryToReady(self, story):
         # Simple AI --- choose the character with maximum cost

@@ -303,10 +303,6 @@ try:
             game.DefendingPlayer.commit(character, story)
 
 
-        # Report
-        print game.report(showCommitted=True), '\n'
-        print game.ActivePlayer.report(), '\n'
-
         screen.readClick()
 
 

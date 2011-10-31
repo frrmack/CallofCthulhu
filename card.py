@@ -266,6 +266,7 @@ class Character(Card):
             self.tempToughness = self.toughness
             self.toughness = 0
             if self.wounds > self.toughness:
+                print genericCardColor(self.name),"loses toughness due to going insane and dies."
                 self.die()
 
 
@@ -297,15 +298,13 @@ class Character(Card):
                 token = self.woundTokenBag[i]
                 pos = WOUNDPOS[self.wounds][i]
                 self.image.drawOn(token.image.surface, pos)
-                x,y = WOUNDPOS[self.wounds][i]
-                pos = 3*x, 3*y
+                pos = 3*pos[0], 3*pos[1]
                 self.image.drawOn(scale(token.image.orgSurface,size=(3*TOKENEDGE,3*TOKENEDGE)), pos, targetSurface=self.image.bigSurface)
 
             if self.isExhausted():
                 self.image.turnLeft()
             if draw:
                 self.image.redraw()
-
 
 
 class Event(Card):

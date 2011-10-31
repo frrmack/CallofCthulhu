@@ -32,12 +32,13 @@ class Board:
     def add(self, card):
         if card.category == 'character':
             self.characters.append(card)
+            card.position = self.characters
         elif card.category == 'support':
             self.supports.append(card)
+            card.position = self.supports
         else:
             msg = "Only characters and certain support cards can be played on a board"
             raise RuleError(msg)
-        card.position = self
         self.redraw()
 
 
