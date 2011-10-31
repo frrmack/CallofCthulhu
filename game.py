@@ -182,6 +182,8 @@ def parseCardFile(cardFileName):
         card.subtypes = fields["Subtypes"].rstrip('.').split('.')
     if "Keywords" in fields:
         card.keywords = fields["Keywords"].rstrip('.').split('.')
+    if "Toughness" in fields:
+        card.toughness = int(fields["Toughness"])
     if "Set" in fields:
         card.set = fields["Set"]
     if "Number" in fields:

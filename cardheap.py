@@ -12,6 +12,11 @@ class CardHeap(list):
     #-- Actions
     def add(self, card):
         self.append(card)
+        card.position = self
+
+    def remove(self, card):
+        list.remove(self, card)
+        card.position = None
 
     def putInBottom(self, card):
         self.insert(0, card)
@@ -43,7 +48,7 @@ class Hand(CardHeap):
 
 
     def remove(self, card):
-        list.remove(self, card)
+        CardHeap.remove(self, card)
         if self.player.position == "Player 2":
             card.image.unhide()
         self.screen = self.player.screen
@@ -113,12 +118,14 @@ class DiscardPile(CardHeap):
     def add(self, card):
         CardHeap.add(self,card)
         self.screen = self.player.screen
-        card.image.surface = scale(card.image.orgSurface, size=(DISCARDWIDTH, DISCARDHEIGHT))
-        card.image.backSurface = scale(card.image.orgBackSurface, size=(DISCARDWIDTH, DISCARDHEIGHT))
         if card.isInsane():
             card.restore()
         if card.isExhausted():
             card.ready()
+        card.wounds = 0
+        card.image.surface = scale(card.image.orgSurface, size=(DISCARDWIDTH, DISCARDHEIGHT))
+        card.image.backSurface = scale(card.image.orgBackSurface, size=(DISCARDWIDTH, DISCARDHEIGHT))
+        card.image.bigSurface = scale(card.image.orgSurface, size=card.image.zoomSize)
         card.image.turnLeft()
         self.redraw()
 

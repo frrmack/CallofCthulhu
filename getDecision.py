@@ -53,6 +53,12 @@ def chooseOneFromStoryToGoInsane(Player, story):
     else:
         raise RuleError("HUMAN PLAYERS NOT CODED YET")
 
+def chooseOneFromStoryToWound(Player, story):
+    if isAI(Player):
+        return Player.chooseOneFromStoryToWound(story)
+    else:
+        raise RuleError("HUMAN PLAYERS NOT CODED YET")
+
 def chooseOneFromStoryToReady(Player, story):
     if isAI(Player):
         return Player.chooseOneFromStoryToReady(story)

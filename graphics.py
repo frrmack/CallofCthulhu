@@ -160,9 +160,9 @@ class Screen(object):
             # center
             #pos = self.width//2 - MESSAGEBOXWIDTH//2, self.height//2 - MESSAGEBOXHEIGHT//2
             # center-left
-            pos = SMALLMARGIN, self.height//2 - MESSAGEBOXHEIGHT//2
+            #pos = SMALLMARGIN, self.height//2 - MESSAGEBOXHEIGHT//2
             # center-right
-            # pos = self.width - MESSAGEBOXWIDTH - SMALLMARGIN, self.height//2 - MESSAGEBOXHEIGHT//2
+            pos = self.width - MESSAGEBOXWIDTH - SMALLMARGIN, self.height//2 - MESSAGEBOXHEIGHT//2
             
         if OKBox:
             okbox.move_ip(pos)
@@ -225,6 +225,13 @@ class Image(object):
         self.screen.drawnImages.append(self)
         return self
         
+    def drawOn(self, surface, pos, targetSurface=None):
+        if targetSurface==None:
+            targetSurface = self.surface
+        # Draw on this surface
+        targetSurface.blit(surface, pos)
+        return self
+
     def clear(self):
         self.screen.blit(self.screen.background.subsurface(self.rect),self.rect)
         self.rect = pygame.Rect(0,0,0,0)
@@ -232,6 +239,10 @@ class Image(object):
         self.size = 0,0
         self.width, self.height = 0,0       
         self.screen.drawnImages.remove(self)
+
+    def redraw(self):
+        self.clear()
+        self.draw(self.pos)
 
     def scale(self, ratio=None, size=None, width=None, height=None):
         self.surface = scale(self.surface, ratio, size, width, height)
@@ -244,7 +255,9 @@ class Image(object):
 class TokenImage(Image):
     def __init__(self, filename, screen=None):
         Image.__init__(self, pygame.image.load(filename).convert_alpha(), screen)
+        self.orgSurface = self.surface.copy()
         self.surface = scale(self.surface, size=(TOKENEDGE,TOKENEDGE))
+
 
     def draw(self, pos):
         #Don't want tokens in ZoomWindow, so no appending to drawnImages
@@ -257,6 +270,10 @@ class TokenImage(Image):
 class SuccessTokenImage(TokenImage):
     def __init__(self, screen=None):
         TokenImage.__init__(self, SUCCESSTOKENIMAGE, screen)
+
+class WoundTokenImage(TokenImage):
+    def __init__(self, screen=None):
+        TokenImage.__init__(self, WOUNDTOKENIMAGE, screen)
 
 
 class CardImage(Image):
@@ -279,6 +296,7 @@ class CardImage(Image):
                                 
     def drawZoomed(self, pos):
         self.drawSurface(self.bigSurface, pos)
+
 
     def hide(self):
         # both surface and bigSurface are switched to cardback

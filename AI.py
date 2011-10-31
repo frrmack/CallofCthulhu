@@ -125,6 +125,11 @@ class AI(Player):
         potentials = filter(lambda c: c.canGoInsane(), story.committed[self])
         return min(potentials, key=lambda c: c.cost)
 
+    def chooseOneFromStoryToWound(self, story):
+        # Simple AI --- choose the character with max toughness
+        potentials = filter(lambda c: c.canBeWounded(), story.committed[self])
+        return max(potentials, key=lambda c: c.toughness - c.wounds)
+
     def chooseOneFromStoryToReady(self, story):
         # Simple AI --- choose the character with maximum cost
         return max(story.committed[self], key=lambda c: c.cost)

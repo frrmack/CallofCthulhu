@@ -88,8 +88,17 @@ class CombatStruggle(Struggle):
     def processAftermath(self):
         #  Apply struggle consequences to
         #  self.winner and self.loser
+        if self.loser is not None:
+            potentials = filter(lambda c: c.canBeWounded(), self.story.committed[self.loser])
+            if len(potentials) > 0:
+                target = getDecision.chooseOneFromStoryToWound(self.loser, self.story)
+                target.wound()
+                self.loser.discardPile.redraw()
+                self.story.redrawCommitted(self.loser)
+                print boldColor(self.winner.name),'chooses', target.name,'to get wounded.'
+            else:
+                print 'None of the committed characters can be wounded.'
 
-        pass
 
         # Reset the winner/loser
         self.winner, self.loser = None, None

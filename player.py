@@ -37,8 +37,8 @@ class Board:
         else:
             msg = "Only characters and certain support cards can be played on a board"
             raise RuleError(msg)
-        if graphicsOn(self.player):
-            self.redraw()
+        card.position = self
+        self.redraw()
 
 
     #-- Graphics
@@ -189,6 +189,7 @@ class Player:
             self.board.characters.remove(card)
             card.exhaust(draw=False)
             story.committed[self].append(card)
+            card.position = story.committed[self]
             self.board.redraw()
             story.redrawCommitted(self)
 
@@ -223,7 +224,6 @@ class Player:
             # play from hand
             self.payCost(card, domain)
             self.hand.remove(card)
-            card.controller = self
 
             # Effect of the card, where does it end up?
             # Playing without a target
@@ -231,6 +231,7 @@ class Player:
                 # Characters and Board Supports go to on player's board
                 if card.category in ['character', 'support']:
                     self.board.add(card)
+                    card.enterGame(self)
                 # Events end up in the discard pile
                 elif card.category == 'event':
                     self.discardPile.add(card)
@@ -245,6 +246,7 @@ class Player:
                     try:
                         target.attach(card)
                         self.board.redraw()
+                        card.enterGame(self)
                     except AttributeError:
                         raise RuleError("You cannot attach to this target")
                 # Anything else is undefined
@@ -256,10 +258,6 @@ class Player:
         for card in deck:
             card.owner = self
 
-    def wound(self, character):
-        character.wounds += 1
-        if character.wounds > character.toughness:
-            self.destroy(character)
 
     def winStory(self, story):
         self.screen.msgBox("%s wins the story\n%s!" % (self.name, story.name), colorscheme=1)
@@ -270,20 +268,6 @@ class Player:
         self.game.replace(story)
         # MORE ON WINNING HERE!!!!!!!!!!!!!!!!!!
         
-
-
-    def destroy(self, card):
-        if card.controller != self:
-            raise RuleError("You can only destroy cards under your control")
-        # remove from current place
-        if card.isOnBoard(self.board):
-            self.board.remove(card)
-        elif card.isInHand(self):
-            self.hand.remove(card)
-        else:
-            raise RuleError("You cannot destroy that card")
-        # put in your discard pile
-        self.discardPile.add(card)
 
 
     #-- Graphics

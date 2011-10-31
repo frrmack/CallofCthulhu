@@ -4,7 +4,7 @@ poisson = numpy.random.poisson
 
 from util import *
 from layout import *
-from graphics import CardImage
+from graphics import CardImage, WoundTokenImage
 
 
 class Card:
@@ -67,6 +67,16 @@ class Card:
         return self.isInState('insane')
 
     #-- Actions
+    def enterGame(self, player):
+        self.controller = player
+        if self.category == "character":
+            self.woundTokenBag = []
+            for i in range(6):
+                token = WoundToken(screen=self.owner.game.screen)
+                self.woundTokenBag.append(token)
+        
+
+
     def exhaust(self, draw=False):
         if not self.isReady():
             raise RuleError("You can only exhaust a ready character")
@@ -116,12 +126,13 @@ class Card:
         card.attach(self)
 
     def die(self):
-        #remove and kill attachments first
         for i in range(len(self.attached)):
             card = self.attached.pop()
             card.owner.discardPile.add(card)
+            card.controller = None
         self.position.remove(self)
         self.owner.discardPile.add(self)
+        self.controller = None
 
     #-- Graphics
     def setScreen(self, screen):
@@ -218,6 +229,12 @@ class Character(Card):
         else:
             return True
 
+    def canBeWounded(self):
+        if 'Invulnerable' in self.keywords:
+            return False
+        else:
+            return True
+
 
     #-- Actions
     def goInsane(self, draw=False):
@@ -263,13 +280,31 @@ class Character(Card):
         # for card in self.attached:
         #     card.image.clear()
         #     card.image.flipCard()
-        if hasattr(self, tempToughness):
+        if hasattr(self, "tempToughness"):
             self.toughness = self.tempToughness
         if draw:
             self.draw(pos)
             self.owner.screen.update()
 
+    def wound(self, draw=False):
+        self.wounds += 1
+        if self.wounds > self.toughness:
+            self.die()
+        else:
+            self.image.surface = scale(self.image.orgSurface, size=self.image.regularSize)
+            self.image.bigSurface = scale(self.image.orgSurface, size=self.image.zoomSize)
+            for i in range(self.wounds):
+                token = self.woundTokenBag[i]
+                pos = WOUNDPOS[self.wounds][i]
+                self.image.drawOn(token.image.surface, pos)
+                x,y = WOUNDPOS[self.wounds][i]
+                pos = 3*x, 3*y
+                self.image.drawOn(scale(token.image.orgSurface,size=(3*TOKENEDGE,3*TOKENEDGE)), pos, targetSurface=self.image.bigSurface)
 
+            if self.isExhausted():
+                self.image.turnLeft()
+            if draw:
+                self.image.redraw()
 
 
 
@@ -330,6 +365,12 @@ class Support(Card):
         return text
                                     
         
+class WoundToken(object):
+    def __init__(self,screen=None):
+        self.image = WoundTokenImage(screen=screen)
+    
+    def draw(self,pos):
+        self.image.draw(pos)
                                     
 
 
