@@ -103,7 +103,7 @@ def downloadCardImage(cardPage):
 # Retrive links to each card in the Core set
 def scrapeCoreSetLinks():
     CoreSetPage = "http://www.cardgamedb.com/index.php/CoC/CoCCards.html/_/core-set/?search_value=&sort_col=field_60&sort_order=asc&per_page=200&st=0"
-    recordLinksFromGallery(CoreSetPage, "core_set_card_links.txt")
+    recordLinksFromGallery(CoreSetPage, "LinkLists/Core_Set_links.txt")
 
 def downloadCoreSetImages():
     f = open("core_set_card_links.txt", 'r')
@@ -116,7 +116,7 @@ def scrapeOtherSetsLinks():
     expansions = {
         'Secrets_of_Arkham' : 'http://www.cardgamedb.com/index.php/CoC/coccardsearch.html?faction=ct%2Cha%2Cmi%2Csh%2Csi%2Csy%2Cag%2Cyo%2Cne&set=82&',
         'The_Order_of_the_Twilight' : 'http://www.cardgamedb.com/index.php/CoC/coccardsearch.html?faction=ct%2Cha%2Cmi%2Csh%2Csi%2Csy%2Cag%2Cyo%2Cne&set=115&',
-        'Forgotten Lore' : 'http://www.cardgamedb.com/index.php/CoC/coccardsearch.html?set=80%2C81%2C142%2C143%2C162%2C172&faction=ct%2Cha%2Cmi%2Csh%2Csi%2Csy%2Cag%2Cyo%2Cne&',
+        'Forgotten_Lore' : 'http://www.cardgamedb.com/index.php/CoC/coccardsearch.html?set=80%2C81%2C142%2C143%2C162%2C172&faction=ct%2Cha%2Cmi%2Csh%2Csi%2Csy%2Cag%2Cyo%2Cne&',
         'Summons_of_the_Deep' : 'http://www.cardgamedb.com/index.php/CoC/coccardsearch.html?set=66%2C67%2C68%2C69%2C70%2C71&faction=ct%2Cha%2Cmi%2Csh%2Csi%2Csy%2Cag%2Cyo%2Cne&',
         'Dream_Lands' : 'http://www.cardgamedb.com/index.php/CoC/coccardsearch.html?faction=ct%2Cha%2Cmi%2Csh%2Csi%2Csy%2Cag%2Cyo%2Cne&set=73%2C74%2C75%2C76%2C77%2C78&',
         'The_Yuggoth_Contract' : 'http://www.cardgamedb.com/index.php/CoC/coccardsearch.html?faction=ct%2Cha%2Cmi%2Csh%2Csi%2Csy%2Cag%2Cyo%2Cne&set=84%2C85%2C86%2C87%2C88%2C89&',
@@ -125,7 +125,7 @@ def scrapeOtherSetsLinks():
         }
     for filename, url in expansions.items():
         print filename, 'Expansion \n'
-        filename += '_links.txt'
+        filename = 'LinkLists/'+ filename + '_links.txt'
         recordLinksFromAdvancedSearch(url, filename)        
         time.sleep(8)
 
@@ -134,7 +134,7 @@ def downloadAllOtherImages():
     expansions = (
         'Secrets_of_Arkham_links.txt', 
         'The_Order_of_the_Twilight_links.txt', 
-        'Forgotten Lore_links.txt', 
+        'Forgotten_Lore_links.txt', 
         'Summons_of_the_Deep_links.txt', 
         'Dream_Lands_links.txt', 
         'The_Yuggoth_Contract_links.txt', 
@@ -142,7 +142,7 @@ def downloadAllOtherImages():
         'Ancient_Relics_links.txt'
         )
     for filename in expansions:
-        f = open(filename, 'r')
+        f = open('LinkLists/' + filename, 'r')
         for line in f.readlines():
             downloadCardImage(line.strip())
             time.sleep(10)
