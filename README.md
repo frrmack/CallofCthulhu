@@ -14,7 +14,7 @@ It's unfinished, so far the game works with the main rules based on card attribu
 ### Demo ###
 
 To watch the interactive demo of two AI players playing with a random
-deck, clone the repo and run the demo script.
+deck each, clone the repo and run the demo script.
 
 ```
 git clone git@github.com:frrmack/CallofCthulhu.git
