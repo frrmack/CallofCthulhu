@@ -7,13 +7,8 @@ It's unfinished, so far the game works with the main rules based on card attribu
 ### Screenshots ###
 
 ----
-![](http://i.imgur.com/9FanhSX.jpg)
+![](http://i.imgur.com/QfQoDHg.gif)
 ----
-![](http://i.imgur.com/cICW0Tj.jpg)
-----
-![](http://i.imgur.com/UudAiUk.jpg)
-----
-![](http://i.imgur.com/f3J7Fj2.jpg)
 ----
 
 
