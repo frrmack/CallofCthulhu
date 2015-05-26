@@ -11,6 +11,21 @@ It's unfinished, so far the game works with the main rules based on card attribu
 ----
 ----
 
+### Demo ###
+
+To watch the interactive demo of two AI players playing with a random
+deck, clone the repo and run the demo script.
+
+```
+git clone git@github.com:frrmack/CallofCthulhu.git
+cd CallofCthulhu
+python run_demo.py
+```
+
+Note that there are resolution, fullscreen/window, and background
+image settings within run_demo.py that you can manually change before
+running it.
+
 
 ### Who made this? ###
 
